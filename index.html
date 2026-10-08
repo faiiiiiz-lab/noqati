@@ -92,14 +92,53 @@ document.getElementById("startButton").onclick=function(){
 };
 
 options.forEach(function(button){
- button.onclick=function(){
-  options.forEach(function(b){b.disabled=true;});
+ button.onclick=async function(){
+
+  options.forEach(function(b){
+   b.disabled=true;
+  });
+
   if(button.dataset.correct==="yes"){
-   questionPage.classList.add("hidden");
-   finalPage.classList.remove("hidden");
+
+   try{
+
+    const {data,error}=await supabaseClient.rpc("is_event_locked");
+
+    if(error){
+     console.error(error);
+     alert("حدث خطأ في التحقق من حالة الفعالية.");
+     options.forEach(function(b){
+      b.disabled=false;
+     });
+     return;
+    }
+
+    if(data===true){
+     lockPage();
+     return;
+    }
+
+    questionPage.classList.add("hidden");
+    finalPage.classList.remove("hidden");
+
+   }catch(error){
+
+    console.error(error);
+    alert("حدث خطأ في الاتصال.");
+    options.forEach(function(b){
+     b.disabled=false;
+    });
+
+   }
+
   }else{
+
    alert("❌ إجابة غير صحيحة.");
-   options.forEach(function(b){b.disabled=false;});
+
+   options.forEach(function(b){
+    b.disabled=false;
+   });
+
   }
  };
 });
