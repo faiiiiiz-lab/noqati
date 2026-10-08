@@ -208,51 +208,142 @@ sendButton.onclick = async function() {
             await supabaseClient.rpc("finalize_event");
 
         if (error) {
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-            console.error(error);
+<title>فعالية الويكند - الصف الرابع</title>
 
-            alert("تعذر إرسال النتيجة. حاول مرة أخرى.");
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-            sendButton.disabled = false;
-            sendButton.textContent = "إرسال النتيجة";
+<style>
 
-            return;
-        }
+* {
+    box-sizing: border-box;
+}
 
-        if (data === true) {
+body {
+    margin: 0;
+    font-family: Tahoma, Arial, sans-serif;
+    background: linear-gradient(135deg, #e8f5e9, #e3f2fd);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #222;
+}
 
-            const phone = "966565441887";
+.container {
+    width: 92%;
+    max-width: 520px;
+    background: white;
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.15);
+    text-align: center;
+}
 
-            const text =
-                "أحسنت يا بطل، حصلت على نقطتين. اسم الطالب: " +
-                winner;
+.logo {
+    font-size: 65px;
+    margin-bottom: 10px;
+}
 
-            window.open(
-                "https://wa.me/" +
-                phone +
-                "?text=" +
-                encodeURIComponent(text),
-                "_blank"
-            );
+h1 {
+    margin: 5px 0;
+    font-size: 30px;
+}
 
-            sendButton.textContent = "تم إرسال النتيجة ✓";
+h2 {
+    margin: 10px 0 25px;
+    font-size: 21px;
+    font-weight: normal;
+}
 
-        } else {
+.subtitle {
+    color: #777;
+    margin-bottom: 25px;
+}
 
-            lockPage();
+input {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #ddd;
+    border-radius: 14px;
+    font-size: 18px;
+    text-align: center;
+    outline: none;
+}
 
-        }
+input:focus {
+    border-color: #2196f3;
+}
 
-    } catch (error) {
+button {
+    width: 100%;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #2196f3;
+    color: white;
+}
 
-        console.error(error);
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 
-        alert("حدث خطأ في الاتصال. حاول مرة أخرى.");
+.option {
+    background: #f5f5f5;
+    color: #222;
+    border: 2px solid #ddd;
+    margin-top: 12px;
+}
 
-        sendButton.disabled = false;
-        sendButton.textContent = "إرسال النتيجة";
-    }
-};
-</script>
-</body>
-</html>
+.option:hover {
+    background: #e3f2fd;
+}
+
+.success {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.points {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+.locked {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
+
+.small {
+    color: #777;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- صفحة الاسم -->
+    <div id="namePage">
+
+        <div class="logo
