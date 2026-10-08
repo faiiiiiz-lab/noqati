@@ -57,8 +57,18 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-const KEY = "weekend_grade4_new_round_1";
+const SUPABASE_URL = "https://apfyqlshgnocvbinosmb.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
 
 const namePage = document.getElementById("namePage");
 const questionPage = document.getElementById("questionPage");
@@ -66,62 +76,136 @@ const finalPage = document.getElementById("finalPage");
 const lockedPage = document.getElementById("lockedPage");
 const nameInput = document.getElementById("studentName");
 const options = document.querySelectorAll(".option");
+const sendButton = document.getElementById("sendButton");
 
-function lockPage(winner) {
+function lockPage() {
     namePage.classList.add("hidden");
     questionPage.classList.add("hidden");
     finalPage.classList.add("hidden");
+
     lockedPage.classList.remove("hidden");
+
     lockedPage.innerHTML =
-        "🔒 <strong>لقد حصل عليها " + winner + "</strong><br>" +
-        "حظًا أوفر! 🌟<br>" +
-        "انتهت الفعالية.<br><br>" +
-        "<strong>حصل عليها " + winner + "</strong>";
+        "🔒 <strong>انتهت الفعالية</strong><br><br>" +
+        "تم الحصول على النقاط من طالب آخر 🏆<br><br>" +
+        "حظًا أوفر للجميع 🌟";
 }
 
+
+/* بدء الفعالية */
 document.getElementById("startButton").onclick = function() {
+
     const name = nameInput.value.trim();
+
     if (!name) {
         alert("فضلاً اكتب الاسم الثلاثي");
         nameInput.focus();
         return;
     }
+
     namePage.classList.add("hidden");
     questionPage.classList.remove("hidden");
 };
 
+
+/* الإجابات */
 options.forEach(function(button) {
+
     button.onclick = function() {
-        options.forEach(function(b) { b.disabled = true; });
+
+        options.forEach(function(b) {
+            b.disabled = true;
+        });
 
         if (button.dataset.correct === "yes") {
+
             questionPage.classList.add("hidden");
             finalPage.classList.remove("hidden");
+
         } else {
+
             alert("❌ إجابة غير صحيحة.");
-            options.forEach(function(b) { b.disabled = false; });
+
+            options.forEach(function(b) {
+                b.disabled = false;
+            });
         }
     };
 });
 
-document.getElementById("sendButton").onclick = function() {
+
+/* إرسال النتيجة */
+sendButton.onclick = async function() {
+
     const winner = nameInput.value.trim();
-    if (!winner) return;
 
-    localStorage.setItem(KEY, winner);
+    if (!winner) {
+        return;
+    }
 
-    const phone = "966565441887";
-    const text = "أحسنت يا بطل، حصلت على نقطتين. اسم الطالب: " + winner;
-    window.open("https://wa.me/" + phone + "?text=" + encodeURIComponent(text), "_blank");
+    sendButton.disabled = true;
+    sendButton.textContent = "جارٍ إرسال النتيجة...";
 
-    lockPage(winner);
+    try {
+
+        const { data, error } = await supabaseClient.rpc(
+            "claim_event",
+            {
+                p_student_name: winner
+            }
+        );
+
+        if (error) {
+
+            console.error(error);
+
+            alert("تعذر إرسال النتيجة. حاول مرة أخرى.");
+
+            sendButton.disabled = false;
+            sendButton.textContent = "إرسال النتيجة";
+
+            return;
+        }
+
+
+        /* أول طالب يفوز */
+        if (data === true) {
+
+            const phone = "966565441887";
+
+            const text =
+                "أحسنت يا بطل، حصلت على نقطتين. اسم الطالب: " +
+                winner;
+
+            window.open(
+                "https://wa.me/" +
+                phone +
+                "?text=" +
+                encodeURIComponent(text),
+                "_blank"
+            );
+
+            lockPage();
+
+        }
+
+        /* شخص آخر سبقه */
+        else {
+
+            lockPage();
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("حدث خطأ في الاتصال. حاول مرة أخرى.");
+
+        sendButton.disabled = false;
+        sendButton.textContent = "إرسال النتيجة";
+    }
 };
-
-// This is a fresh round: no old localStorage key is used.
-const existingWinner = localStorage.getItem(KEY);
-if (existingWinner) {
-    lockPage(existingWinner);
-}
 </script>
 </body>
 </html>
