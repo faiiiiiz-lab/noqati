@@ -121,9 +121,50 @@ options.forEach(function(button) {
 
         if (button.dataset.correct === "yes") {
 
+    const studentName = nameInput.value.trim();
+
+    try {
+
+        const { data, error } = await supabaseClient.rpc(
+            "claim_event",
+            {
+                p_student_name: studentName
+            }
+        );
+
+        if (error) {
+            console.error(error);
+            alert("حدث خطأ في الاتصال. حاول مرة أخرى.");
+
+            options.forEach(function(b) {
+                b.disabled = false;
+            });
+
+            return;
+        }
+
+        if (data === true) {
+
             questionPage.classList.add("hidden");
             finalPage.classList.remove("hidden");
 
+        } else {
+
+            lockPage();
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+        alert("حدث خطأ في الاتصال. حاول مرة أخرى.");
+
+        options.forEach(function(b) {
+            b.disabled = false;
+        });
+    }
+
+}
         } else {
 
             alert("❌ إجابة غير صحيحة.");
