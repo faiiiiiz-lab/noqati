@@ -191,12 +191,21 @@ sendButton.onclick = async function() {
 
     try {
 
-        const { data, error } = await supabaseClient.rpc(
-            "claim_event",
-            {
-                p_student_name: winner
-            }
-        );
+        sendButton.onclick = async function() {
+
+    const winner = nameInput.value.trim();
+
+    if (!winner) {
+        return;
+    }
+
+    sendButton.disabled = true;
+    sendButton.textContent = "جارٍ إرسال النتيجة...";
+
+    try {
+
+        const { data, error } =
+            await supabaseClient.rpc("finalize_event");
 
         if (error) {
 
@@ -210,8 +219,6 @@ sendButton.onclick = async function() {
             return;
         }
 
-
-        /* أول طالب يفوز */
         if (data === true) {
 
             const phone = "966565441887";
@@ -228,12 +235,9 @@ sendButton.onclick = async function() {
                 "_blank"
             );
 
+            sendButton.textContent = "تم إرسال النتيجة ✓";
 
-
-        }
-
-        /* شخص آخر سبقه */
-        else {
+        } else {
 
             lockPage();
 
