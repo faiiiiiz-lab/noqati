@@ -97,11 +97,13 @@ document.getElementById("startButton").onclick = function() {
 
     const name = nameInput.value.trim();
 
-    if (!name) {
-        alert("فضلاً اكتب الاسم الثلاثي");
-        nameInput.focus();
-        return;
-    }
+    const nameParts = name.split(/\s+/).filter(Boolean);
+
+if (nameParts.length !== 3) {
+    alert("فضلاً اكتب الاسم الثلاثي (ثلاثة أسماء)");
+    nameInput.focus();
+    return;
+}
 
     namePage.classList.add("hidden");
     questionPage.classList.remove("hidden");
