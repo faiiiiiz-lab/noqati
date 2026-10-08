@@ -6,10 +6,7 @@
 
 <title>فعالية الويكند - الصف الرابع</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-
 * {
     box-sizing: border-box;
 }
@@ -25,18 +22,18 @@ body {
     color: #222;
 }
 
-.container {
+.card {
     width: 92%;
-    max-width: 520px;
+    max-width: 500px;
     background: white;
     border-radius: 25px;
-    padding: 25px;
-    box-shadow: 0 10px 35px rgba(0,0,0,0.15);
+    padding: 28px;
+    box-shadow: 0 10px 35px rgba(0,0,0,.15);
     text-align: center;
 }
 
 .logo {
-    font-size: 65px;
+    font-size: 60px;
     margin-bottom: 10px;
 }
 
@@ -45,14 +42,9 @@ h1 {
     font-size: 30px;
 }
 
-h2 {
-    margin: 10px 0 25px;
-    font-size: 21px;
-    font-weight: normal;
-}
-
 .subtitle {
     color: #777;
+    font-size: 19px;
     margin-bottom: 25px;
 }
 
@@ -79,30 +71,45 @@ button {
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    background: #2196f3;
-    color: white;
 }
 
-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+.main-btn {
+    background: #2196f3;
+    color: white;
 }
 
 .option {
     background: #f5f5f5;
     color: #222;
     border: 2px solid #ddd;
-    margin-top: 12px;
 }
 
 .option:hover {
     background: #e3f2fd;
 }
 
-.success {
-    font-size: 28px;
+button:disabled {
+    opacity: .6;
+}
+
+.question {
+    font-size: 23px;
     font-weight: bold;
-    margin-bottom: 15px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.final {
+    text-align: center;
+}
+
+.final-icon {
+    font-size: 65px;
+}
+
+.final h2 {
+    font-size: 32px;
+    margin: 10px 0;
 }
 
 .points {
@@ -112,28 +119,340 @@ button:disabled {
 }
 
 .locked {
-    font-size: 22px;
-    font-weight: bold;
+    font-size: 21px;
+    line-height: 2;
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
-
-.small {
-    color: #777;
-    font-size: 14px;
-    margin-top: 20px;
-}
-
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="card">
 
     <!-- صفحة الاسم -->
     <div id="namePage">
 
-        <div class="logo
+        <div class="logo">🎯</div>
+
+        <h1>فعالية الويكند</h1>
+
+        <div class="subtitle">
+            الصف الرابع
+        </div>
+
+        <input
+            id="studentName"
+            type="text"
+            placeholder="اكتب الاسم الثلاثي"
+            autocomplete="off"
+        >
+
+        <button
+            id="startButton"
+            class="main-btn"
+            type="button">
+            ابدأ الفعالية 🚀
+        </button>
+
+    </div>
+
+
+    <!-- صفحة السؤال -->
+    <div id="questionPage" class="hidden">
+
+        <div class="logo">🌱</div>
+
+        <div class="question">
+            ما الذي يحتاجه النبات لكي ينمو؟
+        </div>
+
+        <button
+            class="option"
+            data-correct="yes"
+            type="button">
+            💧 الماء والضوء
+        </button>
+
+        <button
+            class="option"
+            data-correct="no"
+            type="button">
+            🪨 الصخور
+        </button>
+
+        <button
+            class="option"
+            data-correct="no"
+            type="button">
+            🏖️ الرمل فقط
+        </button>
+
+        <button
+            class="option"
+            data-correct="no"
+            type="button">
+            🌑 الظلام
+        </button>
+
+    </div>
+
+
+    <!-- صفحة النجاح -->
+    <div id="finalPage" class="hidden final">
+
+        <div class="final-icon">🎉</div>
+
+        <h2>
+            أحسنت يا بطل
+        </h2>
+
+        <div id="winnerName"></div>
+
+        <div class="points">
+            حصلت على نقطتين 🏆
+        </div>
+
+        <button
+            id="sendButton"
+            class="main-btn"
+            type="button">
+            إرسال النتيجة
+        </button>
+
+    </div>
+
+
+    <!-- صفحة انتهاء الفعالية -->
+    <div id="lockedPage" class="hidden locked">
+
+        <div class="logo">🔒</div>
+
+        <strong>انتهت الفعالية</strong>
+
+        <br><br>
+
+        تم الحصول على النقاط من طالب آخر 🏆
+
+        <br><br>
+
+        حظًا أوفر للجميع 🌟
+
+    </div>
+
+</div>
+
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+"https://apfyqlshgnocvbinosmb.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38";
+
+const supabaseClient =
+window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
+
+
+/* عناصر الصفحة */
+
+const namePage =
+document.getElementById("namePage");
+
+const questionPage =
+document.getElementById("questionPage");
+
+const finalPage =
+document.getElementById("finalPage");
+
+const lockedPage =
+document.getElementById("lockedPage");
+
+const nameInput =
+document.getElementById("studentName");
+
+const startButton =
+document.getElementById("startButton");
+
+const sendButton =
+document.getElementById("sendButton");
+
+const winnerName =
+document.getElementById("winnerName");
+
+const options =
+document.querySelectorAll(".option");
+
+
+/* إظهار انتهاء الفعالية */
+
+function lockPage() {
+
+    namePage.classList.add("hidden");
+
+    questionPage.classList.add("hidden");
+
+    finalPage.classList.add("hidden");
+
+    lockedPage.classList.remove("hidden");
+}
+
+
+/* بدء الفعالية */
+
+startButton.addEventListener("click", function() {
+
+    const name =
+    nameInput.value.trim();
+
+    const parts =
+    name.split(/\s+/).filter(Boolean);
+
+    if (parts.length !== 3) {
+
+        alert(
+            "فضلاً اكتب الاسم الثلاثي (ثلاثة أسماء)"
+        );
+
+        nameInput.focus();
+
+        return;
+    }
+
+    winnerName.textContent =
+    name;
+
+    namePage.classList.add("hidden");
+
+    questionPage.classList.remove("hidden");
+
+});
+
+
+/* الإجابات */
+
+options.forEach(function(button) {
+
+    button.addEventListener("click", function() {
+
+        if (button.dataset.correct === "yes") {
+
+            options.forEach(function(b) {
+                b.disabled = true;
+            });
+
+            questionPage.classList.add("hidden");
+
+            finalPage.classList.remove("hidden");
+
+        } else {
+
+            alert("❌ إجابة غير صحيحة.");
+
+        }
+
+    });
+
+});
+
+
+/* إرسال النتيجة */
+
+sendButton.addEventListener("click", async function() {
+
+    const studentName =
+    nameInput.value.trim();
+
+    if (!studentName) {
+        return;
+    }
+
+    sendButton.disabled = true;
+
+    sendButton.textContent =
+    "جارٍ إرسال النتيجة...";
+
+
+    try {
+
+        const result =
+        await supabaseClient.rpc(
+            "claim_event",
+            {
+                p_student_name: studentName
+            }
+        );
+
+
+        if (result.error) {
+
+            console.error(result.error);
+
+            alert(
+                "تعذر الاتصال. حاول مرة أخرى."
+            );
+
+            sendButton.disabled = false;
+
+            sendButton.textContent =
+            "إرسال النتيجة";
+
+            return;
+        }
+
+
+        /* الطالب الأول */
+
+        if (result.data === true) {
+
+            sendButton.textContent =
+            "تم تسجيل النتيجة ✓";
+
+            /*
+            يبقى الطالب في صفحة النجاح.
+            */
+
+        }
+
+
+        /* طالب جاء بعد الفائز */
+
+        else {
+
+            lockPage();
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert(
+            "حدث خطأ في الاتصال. حاول مرة أخرى."
+        );
+
+        sendButton.disabled = false;
+
+        sendButton.textContent =
+        "إرسال النتيجة";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
