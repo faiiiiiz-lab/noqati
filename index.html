@@ -102,11 +102,16 @@ options.forEach(function(button){
 
    try{
 
-    const {data,error}=await supabaseClient.rpc("is_event_locked");
+    const winner=nameInput.value.trim();
+
+    const {data,error}=await supabaseClient.rpc(
+     "claim_event",
+     {p_student_name:winner}
+    );
 
     if(error){
      console.error(error);
-     alert("حدث خطأ في التحقق من حالة الفعالية.");
+     alert("حدث خطأ في الاتصال.");
      options.forEach(function(b){
       b.disabled=false;
      });
@@ -114,17 +119,22 @@ options.forEach(function(button){
     }
 
     if(data===true){
+
+     questionPage.classList.add("hidden");
+     finalPage.classList.remove("hidden");
+
+    }else{
+
      lockPage();
      return;
-    }
 
-    questionPage.classList.add("hidden");
-    finalPage.classList.remove("hidden");
+    }
 
    }catch(error){
 
     console.error(error);
     alert("حدث خطأ في الاتصال.");
+
     options.forEach(function(b){
      b.disabled=false;
     });
@@ -143,34 +153,21 @@ options.forEach(function(button){
  };
 });
 
-sendButton.onclick=async function(){
+sendButton.onclick=function(){
+
  const winner=nameInput.value.trim();
+
+ const phone="966565441887";
+
+ const text="أحسنت يا بطل، حصلت على نقطتين. اسم الطالب: "+winner;
+
+ window.open(
+  "https://wa.me/"+phone+"?text="+encodeURIComponent(text),
+  "_blank"
+ );
+
  sendButton.disabled=true;
- sendButton.textContent="جارٍ إرسال النتيجة...";
- try{
-  const {data,error}=await supabaseClient.rpc("claim_event",{p_student_name:winner});
-  if(error){
-   console.error(error);
-   alert("تعذر إرسال النتيجة. حاول مرة أخرى.");
-   sendButton.disabled=false;
-   sendButton.textContent="إرسال النتيجة";
-   return;
-  }
-  if(data===true){
-   const phone="966565441887";
-   const text="أحسنت يا بطل، حصلت على نقطتين. اسم الطالب: "+winner;
-   window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(text),"_blank");
-   sendButton.textContent="تم إرسال النتيجة ✓";
-  }else{
-   lockPage();
-  }
- }catch(error){
-  console.error(error);
-  alert("حدث خطأ في الاتصال. حاول مرة أخرى.");
-  sendButton.disabled=false;
-  sendButton.textContent="إرسال النتيجة";
- }
+ sendButton.textContent="تم إرسال النتيجة ✓";
+
 };
-</script>
-</body>
-</html>
+ 
