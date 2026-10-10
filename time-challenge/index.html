@@ -8,64 +8,61 @@
 <style>
 *{box-sizing:border-box}
 body{
-  margin:0;font-family:Tahoma,Arial,sans-serif;
-  background:linear-gradient(145deg,#eaf5ff,#f8fbff);
-  color:#15365c;min-height:100vh;
-  display:flex;justify-content:center;align-items:center;padding:20px
+  margin:0;padding:18px;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  font-family:Tahoma,Arial,sans-serif;
+  background:linear-gradient(145deg,#dceeff,#f8fbff);
+  color:#123867
 }
 .card{
   width:100%;max-width:520px;background:white;
-  border-radius:24px;padding:25px 20px;
-  box-shadow:0 12px 40px #173e6418;text-align:center;
-  border-top:7px solid #1676d2
+  border-radius:24px;padding:24px 19px;text-align:center;
+  box-shadow:0 10px 35px #12386720;border-top:7px solid #0878dc
 }
-.badge{color:#1676d2;font-size:14px;font-weight:bold}
-h1{font-size:30px;margin:12px 0;color:#0759a5}
-.schools{line-height:2;font-size:14px;font-weight:bold}
-.clock{
-  width:115px;height:115px;border:7px solid #1676d2;
-  border-radius:50%;margin:20px auto;
-  display:flex;flex-direction:column;align-items:center;
-  justify-content:center;background:#edf7ff;
-  box-shadow:inset 0 0 0 4px white
-}
-#timer{font-size:39px;font-weight:bold;color:#0759a5}
-label{display:block;text-align:right;font-weight:bold;margin:15px 0 7px}
+h1{font-size:30px;color:#0866bf;margin:14px 0}
+.schools{font-size:14px;font-weight:bold;line-height:2}
+.subtitle{color:#60758c;line-height:1.8}
+label{display:block;text-align:right;font-weight:bold;margin:16px 0 7px}
 input,select{
-  width:100%;padding:14px;border:1px solid #ccdced;
-  border-radius:12px;font-size:16px;background:white;color:#15365c
+  width:100%;padding:14px;border:1px solid #c6d9ef;
+  border-radius:12px;font-size:16px;background:white;color:#123867
 }
 button{
-  width:100%;border:0;border-radius:13px;padding:15px;
-  font-size:17px;font-weight:bold;cursor:pointer;margin-top:18px
+  width:100%;padding:15px;margin-top:17px;border:0;
+  border-radius:13px;font-size:17px;font-weight:bold;cursor:pointer
 }
-.primary{background:#126dc4;color:white}
-.secondary{background:#eaf3fc;color:#0759a5}
-button:disabled{opacity:.5;cursor:not-allowed}
-.note{font-size:13px;color:#667b91;line-height:1.9}
-#challenge{display:none}
-#message{font-weight:bold;line-height:1.9;margin-top:15px}
+.primary{background:#086bd0;color:white}
+.option{background:#edf5ff;color:#123867;border:1px solid #c6dfff;text-align:right}
+button:disabled{opacity:.55}
+.clock{
+  width:118px;height:118px;border:6px solid #0878dc;
+  border-radius:50%;margin:22px auto;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;
+  background:#edf7ff;box-shadow:inset 0 0 0 4px white
+}
+#timer{font-size:42px;font-weight:bold;color:#075cb2}
+#questionPage{display:none}
+#feedback{font-weight:bold;line-height:1.9;margin-top:14px}
+.small{font-size:13px;color:#6b7d90;line-height:1.8}
 </style>
 </head>
 <body>
 <main class="card">
-  <div class="badge">برنامج نقاطي للأنشطة الطلابية</div>
-  <h1>تحدي الوقت ⏱️</h1>
   <div class="schools">
     ابتدائية سهل بن عدي الأنصاري<br>
     متوسطة عاقل بن البكير
   </div>
+  <h1>تحدي الوقت ⏱️</h1>
+  <p class="subtitle">أجب بسرعة واكسب النقطتين</p>
 
-  <section id="entry">
-    <div class="clock"><span id="preview">7</span><small>ثوانٍ</small></div>
-    <p>هل أنت مستعد للتحدي؟</p>
-
+  <section id="entryPage">
+    <p>أدخل اسمك الثلاثي واختر صفك الدراسي لبدء التحدي.</p>
     <label for="student">اسم الطالب الثلاثي</label>
-    <input id="student" maxlength="100" placeholder="اكتب اسمك الثلاثي">
+    <input id="student" maxlength="100" placeholder="مثال: محمد أحمد علي">
 
     <label for="grade">الصف الدراسي</label>
     <select id="grade">
-      <option value="">اختر صفك</option>
+      <option value="">اختر الصف</option>
       <option>الرابع الابتدائي</option>
       <option>الخامس الابتدائي</option>
       <option>السادس الابتدائي</option>
@@ -74,32 +71,118 @@ button:disabled{opacity:.5;cursor:not-allowed}
       <option>الثالث المتوسط</option>
     </select>
 
-    <button class="primary" id="start">ابدأ التحدي</button>
-    <p class="note">الإجابة الصحيحة في الوقت المحدد تستحق نقطتين.</p>
+    <button class="primary" id="startBtn">ابدأ التحدي ▶</button>
+    <p class="small">إجابة صحيحة ضمن الوقت المحدد تستحق نقطتين.</p>
   </section>
 
-  <section id="challenge">
+  <section id="questionPage">
     <div class="clock">
-      <span id="timer">7</span>
+      <span id="timer">10</span>
       <small>ثوانٍ متبقية</small>
     </div>
-    <h2 id="question">نموذج تجريبي</h2>
-    <p class="note">سيُضاف سؤال المنهج المناسب لصفك بعد إعداد بنك الأسئلة.</p>
-    <div id="message">هذه واجهة أولية، ولم تُفعّل الأسئلة الفعلية بعد.</div>
-    <button class="secondary" id="back">العودة</button>
+    <h2 id="question">سؤال تجريبي</h2>
+    <p id="studentInfo" class="small"></p>
+
+    <div id="options">
+      <button class="option" data-answer="a">الخيار الأول</button>
+      <button class="option" data-answer="b">الخيار الثاني</button>
+      <button class="option" data-answer="c">الخيار الثالث</button>
+      <button class="option" data-answer="d">الخيار الرابع</button>
+    </div>
+
+    <div id="feedback" aria-live="polite"></div>
+    <button id="backBtn" class="primary" style="display:none">العودة للبداية</button>
+    <p class="small">السؤال الحالي تجريبي؛ ستُضاف أسئلة المنهج حسب الصف عند تجهيز بنك الأسئلة.</p>
   </section>
 </main>
 
 <script>
-const TIME_LIMIT = 7; // غيّر الرقم لتعديل مدة التحدي
-const startButton = document.getElementById("start");
-const entry = document.getElementById("entry");
-const challenge = document.getElementById("challenge");
-const timer = document.getElementById("timer");
-const message = document.getElementById("message");
-let interval = null;
+const TIME_LIMIT = 10; // غيّر هذا الرقم لتعديل مدة السؤال
 
-startButton.addEventListener("click", () => {
+const entryPage = document.getElementById("entryPage");
+const questionPage = document.getElementById("questionPage");
+const timerDisplay = document.getElementById("timer");
+const feedback = document.getElementById("feedback");
+const options = document.querySelectorAll(".option");
+
+let interval = null;
+let audioContext = null;
+let finished = false;
+let remaining = TIME_LIMIT;
+
+// سؤال تجريبي فقط؛ تُستبدل الأسئلة لاحقًا ببنك أسئلة الصفوف
+const demoQuestion = {
+  text: "سؤال تجريبي: ما عاصمة المملكة العربية السعودية؟",
+  choices: [
+    "جدة",
+    "الرياض",
+    "مكة المكرمة",
+    "المدينة المنورة"
+  ],
+  correct: "b"
+};
+
+function playTick(){
+  try {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioContext.state === "suspended") audioContext.resume();
+
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = 850;
+    gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.22, audioContext.currentTime + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.13);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.14);
+  } catch (e) {
+    // قد يمنع الجهاز الصوت؛ يستمر العداد بصورة طبيعية
+  }
+}
+
+function stopTimer(){
+  clearInterval(interval);
+  interval = null;
+}
+
+function endQuestion(message, isCorrect){
+  if (finished) return;
+  finished = true;
+  stopTimer();
+
+  options.forEach(button => button.disabled = true);
+  feedback.textContent = message;
+  feedback.style.color = isCorrect ? "#168047" : "#c0392b";
+  document.getElementById("backBtn").style.display = "block";
+}
+
+function startTimer(){
+  remaining = TIME_LIMIT;
+  timerDisplay.textContent = remaining;
+
+  // صوت عند بدء العد، ثم صوت مع كل ثانية
+  playTick();
+
+  interval = setInterval(() => {
+    remaining--;
+    timerDisplay.textContent = Math.max(remaining, 0);
+
+    if (remaining > 0) {
+      playTick();
+    } else {
+      endQuestion("انتهى الوقت! لم تحصل على نقاط في هذه المحاولة.", false);
+    }
+  }, 1000);
+}
+
+document.getElementById("startBtn").addEventListener("click", () => {
   const name = document.getElementById("student").value.trim();
   const grade = document.getElementById("grade").value;
 
@@ -112,27 +195,47 @@ startButton.addEventListener("click", () => {
     return;
   }
 
-  entry.style.display = "none";
-  challenge.style.display = "block";
-  timer.textContent = TIME_LIMIT;
-  message.textContent = "الواجهة جاهزة، وسيُفعّل التحدي بعد ربط الأسئلة وقاعدة البيانات.";
+  // تفعيل الصوت نتيجة ضغط الطالب على الزر
+  try {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    audioContext.resume();
+  } catch (e) {}
 
-  let remaining = TIME_LIMIT;
-  clearInterval(interval);
-  interval = setInterval(() => {
-    remaining--;
-    timer.textContent = Math.max(remaining, 0);
-    if (remaining <= 0) {
-      clearInterval(interval);
-      message.textContent = "انتهى الوقت التجريبي!";
-    }
-  }, 1000);
+  document.getElementById("studentInfo").textContent =
+    "الطالب: " + name + " | الصف: " + grade;
+
+  document.getElementById("question").textContent = demoQuestion.text;
+
+  options.forEach((button, index) => {
+    button.textContent = demoQuestion.choices[index];
+    button.disabled = false;
+  });
+
+  feedback.textContent = "";
+  document.getElementById("backBtn").style.display = "none";
+  entryPage.style.display = "none";
+  questionPage.style.display = "block";
+
+  finished = false;
+  startTimer();
 });
 
-document.getElementById("back").addEventListener("click", () => {
-  clearInterval(interval);
-  challenge.style.display = "none";
-  entry.style.display = "block";
+options.forEach(button => {
+  button.addEventListener("click", () => {
+    if (finished) return;
+
+    if (button.dataset.answer === demoQuestion.correct) {
+      endQuestion("أحسنت! إجابة صحيحة، تستحق نقطتين.", true);
+    } else {
+      endQuestion("إجابة غير صحيحة. انتهت المحاولة.", false);
+    }
+  });
+});
+
+document.getElementById("backBtn").addEventListener("click", () => {
+  stopTimer();
+  questionPage.style.display = "none";
+  entryPage.style.display = "block";
 });
 </script>
 </body>
