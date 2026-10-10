@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تحدي الوقت | برنامج نقاطي</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Tahoma,Arial,sans-serif;
+  background:linear-gradient(145deg,#eaf5ff,#f8fbff);
+  color:#15365c;min-height:100vh;
+  display:flex;justify-content:center;align-items:center;padding:20px
+}
+.card{
+  width:100%;max-width:520px;background:white;
+  border-radius:24px;padding:25px 20px;
+  box-shadow:0 12px 40px #173e6418;text-align:center;
+  border-top:7px solid #1676d2
+}
+.badge{color:#1676d2;font-size:14px;font-weight:bold}
+h1{font-size:30px;margin:12px 0;color:#0759a5}
+.schools{line-height:2;font-size:14px;font-weight:bold}
+.clock{
+  width:115px;height:115px;border:7px solid #1676d2;
+  border-radius:50%;margin:20px auto;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;background:#edf7ff;
+  box-shadow:inset 0 0 0 4px white
+}
+#timer{font-size:39px;font-weight:bold;color:#0759a5}
+label{display:block;text-align:right;font-weight:bold;margin:15px 0 7px}
+input,select{
+  width:100%;padding:14px;border:1px solid #ccdced;
+  border-radius:12px;font-size:16px;background:white;color:#15365c
+}
+button{
+  width:100%;border:0;border-radius:13px;padding:15px;
+  font-size:17px;font-weight:bold;cursor:pointer;margin-top:18px
+}
+.primary{background:#126dc4;color:white}
+.secondary{background:#eaf3fc;color:#0759a5}
+button:disabled{opacity:.5;cursor:not-allowed}
+.note{font-size:13px;color:#667b91;line-height:1.9}
+#challenge{display:none}
+#message{font-weight:bold;line-height:1.9;margin-top:15px}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="badge">برنامج نقاطي للأنشطة الطلابية</div>
+  <h1>تحدي الوقت ⏱️</h1>
+  <div class="schools">
+    ابتدائية سهل بن عدي الأنصاري<br>
+    متوسطة عاقل بن البكير
+  </div>
+
+  <section id="entry">
+    <div class="clock"><span id="preview">7</span><small>ثوانٍ</small></div>
+    <p>هل أنت مستعد للتحدي؟</p>
+
+    <label for="student">اسم الطالب الثلاثي</label>
+    <input id="student" maxlength="100" placeholder="اكتب اسمك الثلاثي">
+
+    <label for="grade">الصف الدراسي</label>
+    <select id="grade">
+      <option value="">اختر صفك</option>
+      <option>الرابع الابتدائي</option>
+      <option>الخامس الابتدائي</option>
+      <option>السادس الابتدائي</option>
+      <option>الأول المتوسط</option>
+      <option>الثاني المتوسط</option>
+      <option>الثالث المتوسط</option>
+    </select>
+
+    <button class="primary" id="start">ابدأ التحدي</button>
+    <p class="note">الإجابة الصحيحة في الوقت المحدد تستحق نقطتين.</p>
+  </section>
+
+  <section id="challenge">
+    <div class="clock">
+      <span id="timer">7</span>
+      <small>ثوانٍ متبقية</small>
+    </div>
+    <h2 id="question">نموذج تجريبي</h2>
+    <p class="note">سيُضاف سؤال المنهج المناسب لصفك بعد إعداد بنك الأسئلة.</p>
+    <div id="message">هذه واجهة أولية، ولم تُفعّل الأسئلة الفعلية بعد.</div>
+    <button class="secondary" id="back">العودة</button>
+  </section>
+</main>
+
+<script>
+const TIME_LIMIT = 7; // غيّر الرقم لتعديل مدة التحدي
+const startButton = document.getElementById("start");
+const entry = document.getElementById("entry");
+const challenge = document.getElementById("challenge");
+const timer = document.getElementById("timer");
+const message = document.getElementById("message");
+let interval = null;
+
+startButton.addEventListener("click", () => {
+  const name = document.getElementById("student").value.trim();
+  const grade = document.getElementById("grade").value;
+
+  if (name.split(/\s+/).length < 3) {
+    alert("فضلاً اكتب اسمك الثلاثي.");
+    return;
+  }
+  if (!grade) {
+    alert("فضلاً اختر صفك الدراسي.");
+    return;
+  }
+
+  entry.style.display = "none";
+  challenge.style.display = "block";
+  timer.textContent = TIME_LIMIT;
+  message.textContent = "الواجهة جاهزة، وسيُفعّل التحدي بعد ربط الأسئلة وقاعدة البيانات.";
+
+  let remaining = TIME_LIMIT;
+  clearInterval(interval);
+  interval = setInterval(() => {
+    remaining--;
+    timer.textContent = Math.max(remaining, 0);
+    if (remaining <= 0) {
+      clearInterval(interval);
+      message.textContent = "انتهى الوقت التجريبي!";
+    }
+  }, 1000);
+});
+
+document.getElementById("back").addEventListener("click", () => {
+  clearInterval(interval);
+  challenge.style.display = "none";
+  entry.style.display = "block";
+});
+</script>
+</body>
+</html>
