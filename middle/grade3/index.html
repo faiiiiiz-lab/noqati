@@ -20,25 +20,19 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 .hidden{display:none!important}
 .final{text-align:center;padding:25px 5px}
 .final-icon{font-size:55px}.final h2{font-size:31px;margin:8px 0}.final p{font-size:22px;line-height:1.8}
-.locked{
- background:linear-gradient(145deg,#fff8e8 0%,#fff0ed 100%);
- border:6px solid #edcc72;
- border-radius:48px;
- padding:28px 18px;
- text-align:center;
- line-height:1.8;
- font-size:20px;
- color:#795c32;
- box-shadow:0 10px 25px #edcc7226;
- margin:0 auto;
-}
-.locked .sad-face{font-size:78px;line-height:1.35;margin:0 0 24px}
-.locked .lock-title{font-size:25px;font-weight:bold;margin:0 0 24px}
-.locked .lock-subtitle{font-size:22px;margin:0}
-#lockedPage{display:none}
-#lockedPage:not(.hidden){display:block}
+ .locked{background:linear-gradient(135deg,#fff7e6,#fff0f2);border:2px solid #f0c36d;border-radius:18px;padding:18px 14px;margin:12px auto 0;text-align:center;line-height:1.65;color:#7a4b00;font-size:18px;font-weight:bold;box-shadow:0 5px 16px #b77b2020;animation:stoppedPulse 2.4s ease-in-out infinite}
+.locked .sad-face{display:block;font-size:42px;line-height:1.2;margin:0 0 8px;animation:sadBounce 1.8s ease-in-out infinite;transform-origin:center}
+.locked .lock-title{font-size:21px;font-weight:bold;margin:0 0 8px}
+.locked .lock-subtitle{font-size:18px;margin:0;font-weight:normal}
+.preview-btn{display:block;width:100%;margin-top:12px;padding:11px;border:1px solid #d7ad43;border-radius:12px;background:#fff;color:#79521b;font-size:15px;font-weight:bold}
+.preview-note{background:#fff8df;border:2px dashed #d7ad43;border-radius:12px;padding:10px;margin-bottom:14px;color:#79521b;font-size:15px;line-height:1.7}
+.option.preview-correct{border:3px solid #18864b;background:#e8fff0;font-weight:bold}
+@keyframes sadBounce{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-5px) rotate(-6deg)}60%{transform:translateY(0) rotate(6deg)}}
+@keyframes stoppedPulse{0%,100%{box-shadow:0 5px 16px #b77b2020}50%{box-shadow:0 7px 22px #f0c36d66}}
+@media(prefers-reduced-motion:reduce){.locked .sad-face,.locked{animation:none}}
+#lockedPage{display:none}#lockedPage:not(.hidden){display:block}
 #namePage h1,#namePage .subtitle,#namePage .schools{display:block}
-@media(max-width:420px){.locked{border-width:5px;border-radius:42px;padding:24px 14px}.locked .sad-face{font-size:72px}.locked .lock-title{font-size:23px}.locked .lock-subtitle{font-size:21px}}
+@media(max-width:420px){.locked{padding:16px 12px;border-radius:18px}.locked .sad-face{font-size:40px}.locked .lock-title{font-size:19px}.locked .lock-subtitle{font-size:17px}}
 </style>
 </head>
 <body>
@@ -91,41 +85,32 @@ const sendButton=document.getElementById("sendButton");
 
 let eventActive = true;
 
+let teacherPreviewMode=false;
 function showStoppedPage(){
- questionPage.classList.add("hidden");
- finalPage.classList.add("hidden");
- nameInput.classList.add("hidden");
- document.getElementById("startButton").classList.add("hidden");
+ teacherPreviewMode=false;
+ questionPage.classList.add("hidden"); finalPage.classList.add("hidden");
+ nameInput.classList.add("hidden"); document.getElementById("startButton").classList.add("hidden");
  lockedPage.classList.remove("hidden");
- lockedPage.innerHTML = '<div class="sad-face">😔</div><p class="lock-title">الفعالية متوقفة حاليًا ⏸️</p><p class="lock-subtitle">🌟 ننتظركم قريبًا في تحدٍ جديد!</p>';
+ lockedPage.innerHTML='<div class="sad-face">😔</div><p class="lock-title">الفعالية متوقفة حاليًا ⏸️</p><p class="lock-subtitle">🌟 ننتظركم قريبًا في تحدٍ جديد!</p>';
+ if(new URLSearchParams(location.search).get("preview")==="262626"){
+  const b=document.createElement("button");b.className="preview-btn";b.type="button";b.textContent="👁️ معاينة السؤال للمعلم";lockedPage.appendChild(b);
+  b.onclick=function(){
+   teacherPreviewMode=true;lockedPage.classList.add("hidden");namePage.classList.add("hidden");questionPage.classList.remove("hidden");
+   let note=document.getElementById("teacherPreviewNote");if(!note){note=document.createElement("div");note.id="teacherPreviewNote";note.className="preview-note";questionPage.insertBefore(note,questionPage.firstChild);}
+   const correct=Array.from(options).find(x=>x.dataset.correct==="yes");note.innerHTML='👁️ <strong>وضع معاينة المعلم</strong><br>الإجابة الصحيحة: <strong>'+(correct?correct.textContent:"غير محددة")+'</strong><br>هذه المعاينة لا تسجّل نقاطًا ولا تفتح الفعالية.';
+   options.forEach(x=>{x.disabled=true;x.classList.toggle("preview-correct",x.dataset.correct==="yes")});
+   let back=document.getElementById("exitTeacherPreview");if(!back){back=document.createElement("button");back.id="exitTeacherPreview";back.className="preview-btn";back.textContent="العودة إلى شاشة الإيقاف";questionPage.appendChild(back)}
+   back.onclick=function(){teacherPreviewMode=false;options.forEach(x=>{x.disabled=false;x.classList.remove("preview-correct")});questionPage.classList.add("hidden");note.remove();back.remove();showStoppedPage();};
+  };
+ }
 }
-
-function lockPage(){
- questionPage.classList.add("hidden");
- finalPage.classList.add("hidden");
- nameInput.classList.add("hidden");
- document.getElementById("startButton").classList.add("hidden");
- lockedPage.classList.remove("hidden");
- lockedPage.innerHTML = '<div class="sad-face">😔</div><p class="lock-title">الفعالية متوقفة حاليًا ⏸️</p><p class="lock-subtitle">🌟 ننتظركم قريبًا في تحدٍ جديد!</p>';
-}
-
 async function checkEventActive(){
- try {
-  const {data,error}=await supabaseClient.rpc("get_event_active_grade3");
-  if(error) { console.error(error); return; }
-  eventActive = data === true;
-  if(!eventActive) {
-   showStoppedPage();
-  } else {
-   lockedPage.classList.add("hidden");
-   nameInput.classList.remove("hidden");
-   document.getElementById("startButton").classList.remove("hidden");
-  }
- } catch(error) { console.error(error); }
+ if(teacherPreviewMode)return;
+ try{const {data,error}=await supabaseClient.rpc("get_event_active_grade3");if(error){console.error(error);return;}eventActive=data===true;
+  if(!eventActive)showStoppedPage();else{lockedPage.classList.add("hidden");nameInput.classList.remove("hidden");document.getElementById("startButton").classList.remove("hidden");}
+ }catch(error){console.error(error)}
 }
-
-checkEventActive();
-setInterval(checkEventActive,5000);
+checkEventActive();setInterval(checkEventActive,5000);
 
 document.getElementById("startButton").onclick=function(){
  if(!eventActive){ showStoppedPage(); return; }
