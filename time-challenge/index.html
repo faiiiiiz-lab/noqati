@@ -12,70 +12,45 @@ body{
  margin:0;min-height:100vh;padding:18px;
  display:flex;justify-content:center;align-items:center;
  font-family:Tahoma,Arial,sans-serif;color:var(--navy);
- background:linear-gradient(140deg,#dceeff,#f8fbff 55%,#c6e3ff);
+ background:linear-gradient(140deg,#dceeff,#f8fbff 55%,#c6e3ff)
 }
 .card{
- width:100%;max-width:500px;overflow:hidden;
- background:#fff;border-radius:26px;
- box-shadow:0 18px 50px #164b7b25;
- border:1px solid #d5e8fb;
+ width:100%;max-width:500px;overflow:hidden;background:#fff;
+ border-radius:26px;box-shadow:0 18px 50px #164b7b25;
+ border:1px solid #d5e8fb
 }
 .hero{
- position:relative;padding:25px 18px 22px;text-align:center;
- color:white;
- background:linear-gradient(135deg,#0756a1,#138ce0);
- overflow:hidden;
+ padding:25px 18px 22px;text-align:center;color:white;
+ background:linear-gradient(135deg,#0756a1,#138ce0)
 }
-.hero:before,.hero:after{
- content:"";position:absolute;border:20px solid #ffffff12;
- border-radius:50%;width:150px;height:150px
-}
-.hero:before{top:-95px;right:-45px}
-.hero:after{bottom:-125px;left:-40px}
-.school-photo{
- display:block;width:100%;height:145px;object-fit:cover;
- background:linear-gradient(135deg,#a8d8ff,#eaf6ff);
-}
-.photo-note{
- padding:7px;background:#eef7ff;color:#55728f;
- font-size:11px;text-align:center
-}
-.schools{position:relative;z-index:1;font-size:13px;line-height:2;font-weight:bold}
-h1{position:relative;z-index:1;margin:13px 0 5px;font-size:34px}
-.subtitle{position:relative;z-index:1;margin:0;font-size:14px}
+.school-photo{display:block;width:100%;height:145px;object-fit:cover}
+.photo-note{padding:7px;background:#eef7ff;color:#55728f;font-size:11px;text-align:center}
+.schools{font-size:13px;line-height:2;font-weight:bold}
+h1{margin:13px 0 5px;font-size:34px}
+.subtitle{margin:0;font-size:14px}
 .content{padding:22px 20px 25px}
 .label{display:block;text-align:right;font-weight:bold;margin:15px 0 7px}
 input,select{
  width:100%;padding:14px;border:1px solid #cbdced;
- border-radius:12px;background:#fbfdff;font-size:16px;color:#163e69;
+ border-radius:12px;background:#fbfdff;font-size:16px;color:#163e69
 }
 .btn{
  display:block;width:100%;border:0;border-radius:13px;
- padding:15px;font-size:17px;font-weight:bold;
- cursor:pointer;margin-top:18px
+ padding:15px;font-size:17px;font-weight:bold;cursor:pointer;margin-top:18px
 }
 .primary{background:var(--blue);color:white;box-shadow:0 5px 0 #064d8b}
-.primary:active{transform:translateY(2px);box-shadow:none}
 .small{font-size:12px;line-height:1.9;color:#71839a;text-align:center}
-.features{
- display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px
-}
-.feature{
- padding:12px 7px;border-radius:13px;background:#f0f7ff;
- font-size:12px;text-align:center;line-height:1.8
-}
+.features{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.feature{padding:12px 7px;border-radius:13px;background:#f0f7ff;font-size:12px;text-align:center;line-height:1.8}
 .feature strong{display:block;color:#0868bd;font-size:14px}
 #questionPage,#resultPage{display:none}
-.student-strip{
- background:#eff7ff;padding:11px;border-radius:11px;
- font-size:13px;margin-bottom:15px
-}
+.student-strip{background:#eff7ff;padding:11px;border-radius:11px;font-size:13px;margin-bottom:15px}
 .timer{
- width:125px;height:125px;margin:0 auto 18px;
- display:flex;flex-direction:column;align-items:center;justify-content:center;
+ width:125px;height:125px;margin:0 auto 18px;display:flex;
+ flex-direction:column;align-items:center;justify-content:center;
  border-radius:50%;border:7px solid var(--blue);
  background:radial-gradient(circle,#fff,#e6f4ff);
- box-shadow:inset 0 0 0 4px white,0 5px 15px #1678c32a;
+ box-shadow:inset 0 0 0 4px white,0 5px 15px #1678c32a
 }
 #seconds{font-size:43px;font-weight:bold;color:#0868bd}
 .timer-label{font-size:12px}
@@ -85,20 +60,24 @@ input,select{
  margin:10px 0;border:1px solid #d1e2f4;border-radius:12px;
  background:#f6faff;color:#143d69;font-size:15px;cursor:pointer
 }
-.option:disabled{opacity:.8}
-.option:focus{outline:2px solid #7ebcf1}
-#feedback{text-align:center;font-weight:bold;line-height:1.9;margin-top:15px}
-.result-icon{font-size:55px}
-.gold{color:#c28700;font-size:23px;font-weight:bold}
+.option:disabled{cursor:default;opacity:1}
+.option.correct{background:#e2f7e9;border:2px solid #198754;color:#126b3b;font-weight:bold}
+.option.wrong{background:#fff0f0;border:2px solid #d9534f;color:#a92727}
+#feedback{
+ display:none;text-align:center;font-weight:bold;line-height:1.9;
+ margin-top:18px;padding:15px;border-radius:13px
+}
+#feedback.timeout{display:block;background:#fff4e5;color:#8b4b00;border:1px solid #ffd59a}
+#feedback.success{display:block;background:#e7f8ed;color:#126b3b;border:1px solid #a8e1bb}
+#feedback.fail{display:block;background:#fff0f0;color:#a92727;border:1px solid #f0b7b7}
 </style>
 </head>
 <body>
 <main class="card">
- <img class="school-photo" src="images/school.jpg"
-      alt="صورة المدرسة"
-      onerror="this.style.display='none';document.getElementById('photoNote').style.display='block'">
+ <img class="school-photo" src="images/school.jpg" alt="صورة المدرسة"
+ onerror="this.style.display='none';document.getElementById('photoNote').style.display='block'">
  <div id="photoNote" class="photo-note" style="display:none">
-  صورة المدرسة: أضف الصورة إلى مجلد images باسم school.jpg
+  أضف صورة المدرسة إلى مجلد images باسم school.jpg
  </div>
 
  <header class="hero">
@@ -148,20 +127,19 @@ input,select{
  </section>
 
  <section id="resultPage" class="content" style="text-align:center">
-  <div class="result-icon">🏆</div>
+  <div style="font-size:55px">🏆</div>
   <h2 id="resultTitle">أحسنت!</h2>
   <p id="resultName"></p>
-  <div id="resultPoints" class="gold"></div>
+  <div id="resultPoints" style="color:#c28700;font-size:23px;font-weight:bold"></div>
   <p class="small">هذه نتيجة تجريبية إلى حين ربط قاعدة البيانات.</p>
   <button id="againBtn" class="btn primary">العودة للبداية</button>
  </section>
 </main>
 
 <script>
-const TIME_LIMIT = 10; // عدّل الرقم إذا رغبت بتغيير الوقت
+const TIME_LIMIT = 10; // غيّر الرقم لتعديل مدة السؤال
 
-// سؤال تجريبي مؤقت لاختبار التصميم والعداد.
-// استبدله بأسئلة المنهج بعد تجهيز بنك الأسئلة.
+// سؤال تجريبي مؤقت لاختبار الواجهة
 const DEMO_QUESTION = {
  text: "ما عاصمة المملكة العربية السعودية؟",
  choices: ["جدة","الرياض","مكة المكرمة","المدينة المنورة"],
@@ -173,8 +151,14 @@ const questionPage=document.getElementById("questionPage");
 const resultPage=document.getElementById("resultPage");
 const seconds=document.getElementById("seconds");
 const feedback=document.getElementById("feedback");
-let countdown=null, audioContext=null, finished=false;
-let studentName="", studentGrade="", endAt=0;
+const optionsBox=document.getElementById("options");
+
+let countdown=null;
+let audioContext=null;
+let finished=false;
+let attempted=false;
+let endAt=0;
+let studentName="";
 
 function arabicNumber(n){
  return String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[Number(d)]);
@@ -182,50 +166,72 @@ function arabicNumber(n){
 
 function tickSound(){
  try{
-  if(!audioContext) return;
-  if(audioContext.state==="suspended") audioContext.resume();
+  if(!audioContext)return;
+  if(audioContext.state==="suspended")audioContext.resume();
   const osc=audioContext.createOscillator();
   const gain=audioContext.createGain();
   const now=audioContext.currentTime;
   osc.type="sine";
-  osc.frequency.setValueAtTime(950,now);
+  osc.frequency.value=950;
   gain.gain.setValueAtTime(0.001,now);
   gain.gain.linearRampToValueAtTime(0.20,now+0.015);
   gain.gain.exponentialRampToValueAtTime(0.001,now+0.14);
-  osc.connect(gain);gain.connect(audioContext.destination);
-  osc.start(now);osc.stop(now+0.15);
+  osc.connect(gain);
+  gain.connect(audioContext.destination);
+  osc.start(now);
+  osc.stop(now+0.15);
  }catch(e){}
 }
 
 function stopCountdown(){
- if(countdown!==null) clearInterval(countdown);
+ if(countdown!==null)clearInterval(countdown);
  countdown=null;
 }
 
-function finish(correct,message){
+function showFeedback(type,message){
+ feedback.className=type;
+ feedback.textContent=message;
+}
+
+function revealCorrectAnswer(){
+ document.querySelectorAll(".option").forEach((button,index)=>{
+  if(index===DEMO_QUESTION.correct)button.classList.add("correct");
+ });
+}
+
+function finish(correct,reason){
  if(finished)return;
  finished=true;
  stopCountdown();
- document.querySelectorAll(".option").forEach(b=>b.disabled=true);
- feedback.textContent=message;
- feedback.style.color=correct?"#168047":"#bd3434";
 
- setTimeout(()=>{
-  questionPage.style.display="none";
-  resultPage.style.display="block";
-  document.getElementById("resultTitle").textContent=
-    correct?"أحسنت!":"انتهت المحاولة";
-  document.getElementById("resultName").textContent=studentName;
-  document.getElementById("resultPoints").textContent=
-    correct?"حصلت على نقطتين":"حصلت على صفر نقطة";
- },900);
+ document.querySelectorAll(".option").forEach(button=>{
+  button.disabled=true;
+ });
+
+ revealCorrectAnswer();
+
+ if(reason==="timeout"){
+  showFeedback("timeout",
+   "انتهى الوقت، للأسف فقدت فرصة الإجابة! لا تستطيع إرسال الإجابة الآن. الإجابة الصحيحة موضحة باللون الأخضر لتستفيد منها.");
+ }else if(correct){
+  showFeedback("success","أحسنت! إجابة صحيحة، تستحق نقطتين.");
+  setTimeout(()=>{
+   questionPage.style.display="none";
+   resultPage.style.display="block";
+   document.getElementById("resultTitle").textContent="أحسنت!";
+   document.getElementById("resultName").textContent=studentName;
+   document.getElementById("resultPoints").textContent="حصلت على نقطتين";
+  },1300);
+ }else{
+  showFeedback("fail","إجابة غير صحيحة، انتهت فرصتك. راجع الإجابة الصحيحة باللون الأخضر.");
+ }
 }
 
 function updateCountdown(){
  const remaining=Math.max(0,Math.ceil((endAt-Date.now())/1000));
  seconds.textContent=arabicNumber(remaining);
  if(remaining===0){
-  finish(false,"انتهى الوقت!");
+  finish(false,"timeout");
  }else{
   tickSound();
  }
@@ -236,46 +242,55 @@ function startCountdown(){
  endAt=Date.now()+TIME_LIMIT*1000;
  seconds.textContent=arabicNumber(TIME_LIMIT);
  tickSound();
- countdown=setInterval(updateCountdown,1000);
+ countdown=setInterval(updateCountdown,200);
 }
 
 function renderQuestion(){
  document.getElementById("question").textContent=DEMO_QUESTION.text;
- const container=document.getElementById("options");
- container.replaceChildren();
+ optionsBox.replaceChildren();
 
  DEMO_QUESTION.choices.forEach((choice,index)=>{
   const button=document.createElement("button");
   button.className="option";
   button.textContent=choice;
   button.addEventListener("click",()=>{
-   if(finished)return;
+   if(finished){
+    showFeedback("timeout","لا تستطيع إعادة الإجابة، فقد انتهت فرصتك في هذا التحدي.");
+    return;
+   }
    if(Date.now()>=endAt){
-    finish(false,"انتهى الوقت!");
+    finish(false,"timeout");
     return;
    }
    if(index===DEMO_QUESTION.correct){
-    finish(true,"إجابة صحيحة!");
+    finish(true,"answer");
    }else{
-    finish(false,"إجابة غير صحيحة!");
+    finish(false,"answer");
    }
   });
-  container.appendChild(button);
+  optionsBox.appendChild(button);
  });
 }
 
 document.getElementById("startBtn").addEventListener("click",()=>{
+ if(attempted){
+  alert("لا تستطيع إعادة المحاولة، فقد فقدت فرصتك في هذا التحدي.");
+  return;
+ }
+
  studentName=document.getElementById("student").value.trim();
- studentGrade=document.getElementById("grade").value;
+ const grade=document.getElementById("grade").value;
 
  if(studentName.split(/\s+/).length<3){
   alert("فضلاً اكتب اسمك الثلاثي.");
   return;
  }
- if(!studentGrade){
-  alert("فضلاً اختر صفك الدراسي.");
+ if(!grade){
+  alert("فضلاً اختر الصف الدراسي.");
   return;
  }
+
+ attempted=true;
 
  try{
   const AudioCtx=window.AudioContext||window.webkitAudioContext;
@@ -286,13 +301,16 @@ document.getElementById("startBtn").addEventListener("click",()=>{
  }catch(e){}
 
  document.getElementById("studentInfo").textContent=
-  "الطالب: "+studentName+" — الصف: "+studentGrade;
+  "الطالب: "+studentName+" — الصف: "+grade;
 
+ feedback.className="";
+ feedback.textContent="";
+ feedback.style.display="";
  entryPage.style.display="none";
  resultPage.style.display="none";
  questionPage.style.display="block";
- feedback.textContent="";
  finished=false;
+
  renderQuestion();
  startCountdown();
 });
@@ -304,6 +322,8 @@ document.getElementById("againBtn").addEventListener("click",()=>{
  document.getElementById("student").value="";
  document.getElementById("grade").value="";
 });
+
+window.addEventListener("beforeunload",stopCountdown);
 </script>
 </body>
 </html>
