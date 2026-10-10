@@ -4,238 +4,305 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>تحدي الوقت | برنامج نقاطي</title>
+<title>تحدي الوقت | نقاطي</title>
 <style>
+:root{--blue:#0868bd;--navy:#103c70;--gold:#ffca45}
 *{box-sizing:border-box}
 body{
-  margin:0;padding:18px;min-height:100vh;
-  display:flex;align-items:center;justify-content:center;
-  font-family:Tahoma,Arial,sans-serif;
-  background:linear-gradient(145deg,#dceeff,#f8fbff);
-  color:#123867
+ margin:0;min-height:100vh;padding:18px;
+ display:flex;justify-content:center;align-items:center;
+ font-family:Tahoma,Arial,sans-serif;color:var(--navy);
+ background:linear-gradient(140deg,#dceeff,#f8fbff 55%,#c6e3ff);
 }
 .card{
-  width:100%;max-width:520px;background:white;
-  border-radius:24px;padding:24px 19px;text-align:center;
-  box-shadow:0 10px 35px #12386720;border-top:7px solid #0878dc
+ width:100%;max-width:500px;overflow:hidden;
+ background:#fff;border-radius:26px;
+ box-shadow:0 18px 50px #164b7b25;
+ border:1px solid #d5e8fb;
 }
-h1{font-size:30px;color:#0866bf;margin:14px 0}
-.schools{font-size:14px;font-weight:bold;line-height:2}
-.subtitle{color:#60758c;line-height:1.8}
-label{display:block;text-align:right;font-weight:bold;margin:16px 0 7px}
+.hero{
+ position:relative;padding:25px 18px 22px;text-align:center;
+ color:white;
+ background:linear-gradient(135deg,#0756a1,#138ce0);
+ overflow:hidden;
+}
+.hero:before,.hero:after{
+ content:"";position:absolute;border:20px solid #ffffff12;
+ border-radius:50%;width:150px;height:150px
+}
+.hero:before{top:-95px;right:-45px}
+.hero:after{bottom:-125px;left:-40px}
+.school-photo{
+ display:block;width:100%;height:145px;object-fit:cover;
+ background:linear-gradient(135deg,#a8d8ff,#eaf6ff);
+}
+.photo-note{
+ padding:7px;background:#eef7ff;color:#55728f;
+ font-size:11px;text-align:center
+}
+.schools{position:relative;z-index:1;font-size:13px;line-height:2;font-weight:bold}
+h1{position:relative;z-index:1;margin:13px 0 5px;font-size:34px}
+.subtitle{position:relative;z-index:1;margin:0;font-size:14px}
+.content{padding:22px 20px 25px}
+.label{display:block;text-align:right;font-weight:bold;margin:15px 0 7px}
 input,select{
-  width:100%;padding:14px;border:1px solid #c6d9ef;
-  border-radius:12px;font-size:16px;background:white;color:#123867
+ width:100%;padding:14px;border:1px solid #cbdced;
+ border-radius:12px;background:#fbfdff;font-size:16px;color:#163e69;
 }
-button{
-  width:100%;padding:15px;margin-top:17px;border:0;
-  border-radius:13px;font-size:17px;font-weight:bold;cursor:pointer
+.btn{
+ display:block;width:100%;border:0;border-radius:13px;
+ padding:15px;font-size:17px;font-weight:bold;
+ cursor:pointer;margin-top:18px
 }
-.primary{background:#086bd0;color:white}
-.option{background:#edf5ff;color:#123867;border:1px solid #c6dfff;text-align:right}
-button:disabled{opacity:.55}
-.clock{
-  width:118px;height:118px;border:6px solid #0878dc;
-  border-radius:50%;margin:22px auto;display:flex;
-  flex-direction:column;align-items:center;justify-content:center;
-  background:#edf7ff;box-shadow:inset 0 0 0 4px white
+.primary{background:var(--blue);color:white;box-shadow:0 5px 0 #064d8b}
+.primary:active{transform:translateY(2px);box-shadow:none}
+.small{font-size:12px;line-height:1.9;color:#71839a;text-align:center}
+.features{
+ display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px
 }
-#timer{font-size:42px;font-weight:bold;color:#075cb2}
-#questionPage{display:none}
-#feedback{font-weight:bold;line-height:1.9;margin-top:14px}
-.small{font-size:13px;color:#6b7d90;line-height:1.8}
+.feature{
+ padding:12px 7px;border-radius:13px;background:#f0f7ff;
+ font-size:12px;text-align:center;line-height:1.8
+}
+.feature strong{display:block;color:#0868bd;font-size:14px}
+#questionPage,#resultPage{display:none}
+.student-strip{
+ background:#eff7ff;padding:11px;border-radius:11px;
+ font-size:13px;margin-bottom:15px
+}
+.timer{
+ width:125px;height:125px;margin:0 auto 18px;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ border-radius:50%;border:7px solid var(--blue);
+ background:radial-gradient(circle,#fff,#e6f4ff);
+ box-shadow:inset 0 0 0 4px white,0 5px 15px #1678c32a;
+}
+#seconds{font-size:43px;font-weight:bold;color:#0868bd}
+.timer-label{font-size:12px}
+.question-title{font-size:19px;line-height:1.8;text-align:center}
+.option{
+ display:block;width:100%;text-align:right;padding:13px 15px;
+ margin:10px 0;border:1px solid #d1e2f4;border-radius:12px;
+ background:#f6faff;color:#143d69;font-size:15px;cursor:pointer
+}
+.option:disabled{opacity:.8}
+.option:focus{outline:2px solid #7ebcf1}
+#feedback{text-align:center;font-weight:bold;line-height:1.9;margin-top:15px}
+.result-icon{font-size:55px}
+.gold{color:#c28700;font-size:23px;font-weight:bold}
 </style>
 </head>
 <body>
 <main class="card">
+ <img class="school-photo" src="images/school.jpg"
+      alt="صورة المدرسة"
+      onerror="this.style.display='none';document.getElementById('photoNote').style.display='block'">
+ <div id="photoNote" class="photo-note" style="display:none">
+  صورة المدرسة: أضف الصورة إلى مجلد images باسم school.jpg
+ </div>
+
+ <header class="hero">
   <div class="schools">
-    ابتدائية سهل بن عدي الأنصاري<br>
-    متوسطة عاقل بن البكير
+   ابتدائية سهل بن عدي الأنصاري<br>
+   متوسطة عاقل بن البكير
   </div>
   <h1>تحدي الوقت ⏱️</h1>
-  <p class="subtitle">أجب بسرعة واكسب النقطتين</p>
+  <p class="subtitle">فكّر بسرعة، أجب بدقة، واجمع النقاط!</p>
+ </header>
 
-  <section id="entryPage">
-    <p>أدخل اسمك الثلاثي واختر صفك الدراسي لبدء التحدي.</p>
-    <label for="student">اسم الطالب الثلاثي</label>
-    <input id="student" maxlength="100" placeholder="مثال: محمد أحمد علي">
+ <section id="entryPage" class="content">
+  <label class="label" for="student">اسم الطالب الثلاثي</label>
+  <input id="student" maxlength="100" placeholder="اكتب اسمك الثلاثي">
 
-    <label for="grade">الصف الدراسي</label>
-    <select id="grade">
-      <option value="">اختر الصف</option>
-      <option>الرابع الابتدائي</option>
-      <option>الخامس الابتدائي</option>
-      <option>السادس الابتدائي</option>
-      <option>الأول المتوسط</option>
-      <option>الثاني المتوسط</option>
-      <option>الثالث المتوسط</option>
-    </select>
+  <label class="label" for="grade">الصف الدراسي</label>
+  <select id="grade">
+   <option value="">اختر الصف</option>
+   <option>الرابع الابتدائي</option>
+   <option>الخامس الابتدائي</option>
+   <option>السادس الابتدائي</option>
+   <option>الأول المتوسط</option>
+   <option>الثاني المتوسط</option>
+   <option>الثالث المتوسط</option>
+  </select>
 
-    <button class="primary" id="startBtn">ابدأ التحدي ▶</button>
-    <p class="small">إجابة صحيحة ضمن الوقت المحدد تستحق نقطتين.</p>
-  </section>
+  <button id="startBtn" class="btn primary">ابدأ التحدي ←</button>
 
-  <section id="questionPage">
-    <div class="clock">
-      <span id="timer">10</span>
-      <small>ثوانٍ متبقية</small>
-    </div>
-    <h2 id="question">سؤال تجريبي</h2>
-    <p id="studentInfo" class="small"></p>
+  <div class="features">
+   <div class="feature">🏆 <strong>نقطتان</strong>للإجابة الصحيحة</div>
+   <div class="feature">⏱️ <strong>١٠ ثوانٍ</strong>وقت محدد للسؤال</div>
+   <div class="feature">📚 <strong>منهجك الدراسي</strong>أسئلة حسب الصف</div>
+   <div class="feature">🎯 <strong>التركيز والسرعة</strong>هما سر التحدي</div>
+  </div>
+  <p class="small">استعد، وابدأ التحدي عندما تكون جاهزًا.</p>
+ </section>
 
-    <div id="options">
-      <button class="option" data-answer="a">الخيار الأول</button>
-      <button class="option" data-answer="b">الخيار الثاني</button>
-      <button class="option" data-answer="c">الخيار الثالث</button>
-      <button class="option" data-answer="d">الخيار الرابع</button>
-    </div>
+ <section id="questionPage" class="content">
+  <div id="studentInfo" class="student-strip"></div>
+  <div class="timer">
+   <span id="seconds">١٠</span>
+   <span class="timer-label">ثوانٍ متبقية</span>
+  </div>
+  <h2 id="question" class="question-title"></h2>
+  <div id="options"></div>
+  <div id="feedback" aria-live="polite"></div>
+ </section>
 
-    <div id="feedback" aria-live="polite"></div>
-    <button id="backBtn" class="primary" style="display:none">العودة للبداية</button>
-    <p class="small">السؤال الحالي تجريبي؛ ستُضاف أسئلة المنهج حسب الصف عند تجهيز بنك الأسئلة.</p>
-  </section>
+ <section id="resultPage" class="content" style="text-align:center">
+  <div class="result-icon">🏆</div>
+  <h2 id="resultTitle">أحسنت!</h2>
+  <p id="resultName"></p>
+  <div id="resultPoints" class="gold"></div>
+  <p class="small">هذه نتيجة تجريبية إلى حين ربط قاعدة البيانات.</p>
+  <button id="againBtn" class="btn primary">العودة للبداية</button>
+ </section>
 </main>
 
 <script>
-const TIME_LIMIT = 10; // غيّر هذا الرقم لتعديل مدة السؤال
+const TIME_LIMIT = 10; // عدّل الرقم إذا رغبت بتغيير الوقت
 
-const entryPage = document.getElementById("entryPage");
-const questionPage = document.getElementById("questionPage");
-const timerDisplay = document.getElementById("timer");
-const feedback = document.getElementById("feedback");
-const options = document.querySelectorAll(".option");
-
-let interval = null;
-let audioContext = null;
-let finished = false;
-let remaining = TIME_LIMIT;
-
-// سؤال تجريبي فقط؛ تُستبدل الأسئلة لاحقًا ببنك أسئلة الصفوف
-const demoQuestion = {
-  text: "سؤال تجريبي: ما عاصمة المملكة العربية السعودية؟",
-  choices: [
-    "جدة",
-    "الرياض",
-    "مكة المكرمة",
-    "المدينة المنورة"
-  ],
-  correct: "b"
+// سؤال تجريبي مؤقت لاختبار التصميم والعداد.
+// استبدله بأسئلة المنهج بعد تجهيز بنك الأسئلة.
+const DEMO_QUESTION = {
+ text: "ما عاصمة المملكة العربية السعودية؟",
+ choices: ["جدة","الرياض","مكة المكرمة","المدينة المنورة"],
+ correct: 1
 };
 
-function playTick(){
-  try {
-    if (!audioContext) {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioContext.state === "suspended") audioContext.resume();
+const entryPage=document.getElementById("entryPage");
+const questionPage=document.getElementById("questionPage");
+const resultPage=document.getElementById("resultPage");
+const seconds=document.getElementById("seconds");
+const feedback=document.getElementById("feedback");
+let countdown=null, audioContext=null, finished=false;
+let studentName="", studentGrade="", endAt=0;
 
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-
-    oscillator.type = "sine";
-    oscillator.frequency.value = 850;
-    gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.22, audioContext.currentTime + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.13);
-
-    oscillator.connect(gain);
-    gain.connect(audioContext.destination);
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + 0.14);
-  } catch (e) {
-    // قد يمنع الجهاز الصوت؛ يستمر العداد بصورة طبيعية
-  }
+function arabicNumber(n){
+ return String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[Number(d)]);
 }
 
-function stopTimer(){
-  clearInterval(interval);
-  interval = null;
+function tickSound(){
+ try{
+  if(!audioContext) return;
+  if(audioContext.state==="suspended") audioContext.resume();
+  const osc=audioContext.createOscillator();
+  const gain=audioContext.createGain();
+  const now=audioContext.currentTime;
+  osc.type="sine";
+  osc.frequency.setValueAtTime(950,now);
+  gain.gain.setValueAtTime(0.001,now);
+  gain.gain.linearRampToValueAtTime(0.20,now+0.015);
+  gain.gain.exponentialRampToValueAtTime(0.001,now+0.14);
+  osc.connect(gain);gain.connect(audioContext.destination);
+  osc.start(now);osc.stop(now+0.15);
+ }catch(e){}
 }
 
-function endQuestion(message, isCorrect){
-  if (finished) return;
-  finished = true;
-  stopTimer();
-
-  options.forEach(button => button.disabled = true);
-  feedback.textContent = message;
-  feedback.style.color = isCorrect ? "#168047" : "#c0392b";
-  document.getElementById("backBtn").style.display = "block";
+function stopCountdown(){
+ if(countdown!==null) clearInterval(countdown);
+ countdown=null;
 }
 
-function startTimer(){
-  remaining = TIME_LIMIT;
-  timerDisplay.textContent = remaining;
+function finish(correct,message){
+ if(finished)return;
+ finished=true;
+ stopCountdown();
+ document.querySelectorAll(".option").forEach(b=>b.disabled=true);
+ feedback.textContent=message;
+ feedback.style.color=correct?"#168047":"#bd3434";
 
-  // صوت عند بدء العد، ثم صوت مع كل ثانية
-  playTick();
-
-  interval = setInterval(() => {
-    remaining--;
-    timerDisplay.textContent = Math.max(remaining, 0);
-
-    if (remaining > 0) {
-      playTick();
-    } else {
-      endQuestion("انتهى الوقت! لم تحصل على نقاط في هذه المحاولة.", false);
-    }
-  }, 1000);
+ setTimeout(()=>{
+  questionPage.style.display="none";
+  resultPage.style.display="block";
+  document.getElementById("resultTitle").textContent=
+    correct?"أحسنت!":"انتهت المحاولة";
+  document.getElementById("resultName").textContent=studentName;
+  document.getElementById("resultPoints").textContent=
+    correct?"حصلت على نقطتين":"حصلت على صفر نقطة";
+ },900);
 }
 
-document.getElementById("startBtn").addEventListener("click", () => {
-  const name = document.getElementById("student").value.trim();
-  const grade = document.getElementById("grade").value;
+function updateCountdown(){
+ const remaining=Math.max(0,Math.ceil((endAt-Date.now())/1000));
+ seconds.textContent=arabicNumber(remaining);
+ if(remaining===0){
+  finish(false,"انتهى الوقت!");
+ }else{
+  tickSound();
+ }
+}
 
-  if (name.split(/\s+/).length < 3) {
-    alert("فضلاً اكتب اسمك الثلاثي.");
+function startCountdown(){
+ stopCountdown();
+ endAt=Date.now()+TIME_LIMIT*1000;
+ seconds.textContent=arabicNumber(TIME_LIMIT);
+ tickSound();
+ countdown=setInterval(updateCountdown,1000);
+}
+
+function renderQuestion(){
+ document.getElementById("question").textContent=DEMO_QUESTION.text;
+ const container=document.getElementById("options");
+ container.replaceChildren();
+
+ DEMO_QUESTION.choices.forEach((choice,index)=>{
+  const button=document.createElement("button");
+  button.className="option";
+  button.textContent=choice;
+  button.addEventListener("click",()=>{
+   if(finished)return;
+   if(Date.now()>=endAt){
+    finish(false,"انتهى الوقت!");
     return;
-  }
-  if (!grade) {
-    alert("فضلاً اختر صفك الدراسي.");
-    return;
-  }
-
-  // تفعيل الصوت نتيجة ضغط الطالب على الزر
-  try {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    audioContext.resume();
-  } catch (e) {}
-
-  document.getElementById("studentInfo").textContent =
-    "الطالب: " + name + " | الصف: " + grade;
-
-  document.getElementById("question").textContent = demoQuestion.text;
-
-  options.forEach((button, index) => {
-    button.textContent = demoQuestion.choices[index];
-    button.disabled = false;
+   }
+   if(index===DEMO_QUESTION.correct){
+    finish(true,"إجابة صحيحة!");
+   }else{
+    finish(false,"إجابة غير صحيحة!");
+   }
   });
+  container.appendChild(button);
+ });
+}
 
-  feedback.textContent = "";
-  document.getElementById("backBtn").style.display = "none";
-  entryPage.style.display = "none";
-  questionPage.style.display = "block";
+document.getElementById("startBtn").addEventListener("click",()=>{
+ studentName=document.getElementById("student").value.trim();
+ studentGrade=document.getElementById("grade").value;
 
-  finished = false;
-  startTimer();
+ if(studentName.split(/\s+/).length<3){
+  alert("فضلاً اكتب اسمك الثلاثي.");
+  return;
+ }
+ if(!studentGrade){
+  alert("فضلاً اختر صفك الدراسي.");
+  return;
+ }
+
+ try{
+  const AudioCtx=window.AudioContext||window.webkitAudioContext;
+  if(AudioCtx){
+   audioContext=new AudioCtx();
+   audioContext.resume();
+  }
+ }catch(e){}
+
+ document.getElementById("studentInfo").textContent=
+  "الطالب: "+studentName+" — الصف: "+studentGrade;
+
+ entryPage.style.display="none";
+ resultPage.style.display="none";
+ questionPage.style.display="block";
+ feedback.textContent="";
+ finished=false;
+ renderQuestion();
+ startCountdown();
 });
 
-options.forEach(button => {
-  button.addEventListener("click", () => {
-    if (finished) return;
-
-    if (button.dataset.answer === demoQuestion.correct) {
-      endQuestion("أحسنت! إجابة صحيحة، تستحق نقطتين.", true);
-    } else {
-      endQuestion("إجابة غير صحيحة. انتهت المحاولة.", false);
-    }
-  });
-});
-
-document.getElementById("backBtn").addEventListener("click", () => {
-  stopTimer();
-  questionPage.style.display = "none";
-  entryPage.style.display = "block";
+document.getElementById("againBtn").addEventListener("click",()=>{
+ stopCountdown();
+ resultPage.style.display="none";
+ entryPage.style.display="block";
+ document.getElementById("student").value="";
+ document.getElementById("grade").value="";
 });
 </script>
 </body>
