@@ -124,6 +124,7 @@ function showStoppedState(){
  }
 }
 function showActiveState(){
+ if(teacherPreviewMode) return;
  eventActive=true;
  stoppedNotice.classList.add("hidden");
  nameInput.classList.remove("hidden");
@@ -131,6 +132,8 @@ function showActiveState(){
  options.forEach(function(b){b.disabled=false;});
 }
 async function checkEventActive(){
+ // لا تسمح للفحص الدوري بإخفاء صفحة معاينة المعلم أثناء عرضها
+ if(teacherPreviewMode) return false;
  if(checkingActive) return eventActive;
  checkingActive=true;
  try{
