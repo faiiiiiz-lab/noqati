@@ -21,6 +21,8 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 .final{text-align:center;padding:25px 5px}
 .final-icon{font-size:55px}.final h2{font-size:31px;margin:8px 0}.final p{font-size:22px;line-height:1.8}
 .locked{background:#fff0f0;border-radius:18px;padding:25px;text-align:center;line-height:2;font-size:20px}
+.stopped{background:linear-gradient(135deg,#fff8e9,#fff0f0);border:3px solid #efc66d;border-radius:24px;padding:25px;text-align:center;line-height:2;color:#79521b;font-size:20px;box-shadow:0 8px 25px #efc66d33}
+.stop-icon{font-size:58px;margin-bottom:8px}.stopped p{margin:10px 0 0;font-size:18px}
 </style>
 </head>
 <body>
@@ -36,6 +38,12 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 </p>
 <input id="studentName" type="text" placeholder="اكتب الاسم الثلاثي" autocomplete="off">
 <button id="startButton" class="main-btn" type="button">ابدأ الفعالية 🚀</button>
+</div>
+
+<div id="stoppedPage" class="hidden stopped">
+<div class="stop-icon">😔</div>
+<strong>⏸️ الفعالية متوقفة حاليًا</strong>
+<p>🌟 ننتظركم قريبًا في تحدٍ جديد!</p>
 </div>
 
 <div id="questionPage" class="hidden">
@@ -67,9 +75,41 @@ const namePage=document.getElementById("namePage");
 const questionPage=document.getElementById("questionPage");
 const finalPage=document.getElementById("finalPage");
 const lockedPage=document.getElementById("lockedPage");
+const stoppedPage=document.getElementById("stoppedPage");
+let eventActive=false;
 const nameInput=document.getElementById("studentName");
 const options=document.querySelectorAll(".option");
 const sendButton=document.getElementById("sendButton");
+
+function showStoppedPage(){
+ namePage.classList.add("hidden");
+ questionPage.classList.add("hidden");
+ finalPage.classList.add("hidden");
+ lockedPage.classList.add("hidden");
+ stoppedPage.classList.remove("hidden");
+}
+async function checkEventActive(){
+ namePage.classList.add("hidden");
+ stoppedPage.classList.remove("hidden");
+ stoppedPage.innerHTML='<div class="stop-icon">⏳</div><strong>جارٍ التحقق من حالة الفعالية...</strong>';
+ try{
+  const {data,error}=await supabaseClient.rpc("get_event_active_grade5");
+  if(error) throw error;
+  eventActive=data===true;
+  if(eventActive){
+   stoppedPage.classList.add("hidden");
+   namePage.classList.remove("hidden");
+  }else{
+   showStoppedPage();
+  }
+ }catch(error){
+  console.error(error);
+  eventActive=false;
+  stoppedPage.innerHTML='<div class="stop-icon">⏳</div><strong>تعذر التحقق من حالة الفعالية</strong><p>يرجى المحاولة بعد قليل.</p>';
+  showStoppedPage();
+ }
+}
+checkEventActive();
 
 function lockPage(){
  namePage.classList.add("hidden");
