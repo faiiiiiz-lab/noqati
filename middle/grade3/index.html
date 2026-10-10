@@ -24,6 +24,19 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 .locked .sad-face{display:block;font-size:42px;line-height:1.2;margin:0 0 8px;animation:sadBounce 1.8s ease-in-out infinite;transform-origin:center}
 .locked .lock-title{font-size:21px;font-weight:bold;margin:0 0 8px}
 .locked .lock-subtitle{font-size:18px;margin:0;font-weight:normal}
+
+/* تنبيه الطالب الثاني: ثابت ولا يختفي تلقائيًا */
+.locked .ended-title{font-size:22px;font-weight:bold;color:#17324d;margin:0 0 34px}
+.locked .ended-message{font-size:21px;font-weight:normal;color:#17324d;line-height:1.8;margin:0 0 34px}
+.locked .ended-footer{font-size:20px;font-weight:normal;color:#17324d;margin:0}
+.locked:has(.ended-title){background:#fff0f1;border:0;border-radius:26px;padding:28px 20px;margin:12px auto 0;color:#17324d;box-shadow:none;animation:none;line-height:1.8}
+@media(max-width:420px){
+ .locked .ended-title{font-size:20px;margin-bottom:28px}
+ .locked .ended-message{font-size:19px;margin-bottom:28px}
+ .locked .ended-footer{font-size:18px}
+ .locked:has(.ended-title){padding:24px 16px}
+}
+
 .preview-btn{display:block;width:100%;margin-top:12px;padding:11px;border:1px solid #d7ad43;border-radius:12px;background:#fff;color:#79521b;font-size:15px;font-weight:bold}
 .preview-note{background:#fff8df;border:2px dashed #d7ad43;border-radius:12px;padding:10px;margin-bottom:14px;color:#79521b;font-size:15px;line-height:1.7}
 .option.preview-correct{border:3px solid #18864b;background:#e8fff0;font-weight:bold}
@@ -87,6 +100,7 @@ const teacherPreviewRequested = new URLSearchParams(window.location.search).get(
 let eventActive = true;
 
 let teacherPreviewMode=false;
+let resultLocked=false;
 function showStoppedPage(){
  teacherPreviewMode=false;
  questionPage.classList.add("hidden"); finalPage.classList.add("hidden");
@@ -105,7 +119,21 @@ function showStoppedPage(){
   };
  }
 }
+
+function lockPage(){
+ resultLocked=true;
+ namePage.classList.add("hidden");
+ questionPage.classList.add("hidden");
+ finalPage.classList.add("hidden");
+ lockedPage.classList.remove("hidden");
+ lockedPage.innerHTML =
+   '<div class="ended-title">🔒 انتهت الفعالية</div>' +
+   '<div class="ended-message">تم الحصول على النقاط من طالب آخر 🏆</div>' +
+   '<div class="ended-footer">حظًا أوفر للجميع 🌟</div>';
+}
+
 async function checkEventActive(){
+ if(resultLocked)return;
  if(teacherPreviewMode)return;
  if(teacherPreviewRequested){showStoppedPage();return;}
  try{const {data,error}=await supabaseClient.rpc("get_event_active_grade3");if(error){console.error(error);return;}eventActive=data===true;
@@ -168,7 +196,7 @@ options.forEach(function(button){
 
    }catch(error){
 
-    console.error(error);
+    console.error("خطأ أثناء تسجيل نتيجة الصف الثالث متوسط:", error);
     alert("حدث خطأ في الاتصال.");
 
     options.forEach(function(b){
