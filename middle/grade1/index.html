@@ -21,6 +21,9 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 .final{text-align:center;padding:25px 5px}
 .final-icon{font-size:55px}.final h2{font-size:31px;margin:8px 0}.final p{font-size:22px;line-height:1.8}
 .locked{background:#fff0f0;border-radius:18px;padding:25px;text-align:center;line-height:2;font-size:20px}
+.stopped{margin:18px 0;padding:22px 14px;background:#fff0f0;border:1px solid #f5caca;border-radius:18px;text-align:center;color:#8b3030;line-height:1.8}
+.sad-face{font-size:54px;display:block;animation:sadBounce 1.8s ease-in-out infinite}
+@keyframes sadBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 </style>
 </head>
 <body>
@@ -34,6 +37,7 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 ابتدائية سهل بن عدي الأنصاري<br>
 ومتوسطة عاقل بن البكير
 </p>
+<div id="stoppedNotice" class="stopped hidden"><span class="sad-face">😔</span><strong>الفعالية متوقفة حاليًا</strong><br>نرجو متابعة الإعلانات لمعرفة موعد عودتها.</div>
 <input id="studentName" type="text" placeholder="اكتب الاسم الثلاثي" autocomplete="off">
 <button id="startButton" class="main-btn" type="button">ابدأ الفعالية 🚀</button>
 </div>
@@ -70,6 +74,10 @@ const lockedPage=document.getElementById("lockedPage");
 const nameInput=document.getElementById("studentName");
 const options=document.querySelectorAll(".option");
 const sendButton=document.getElementById("sendButton");
+const stoppedNotice=document.getElementById("stoppedNotice");
+const startButton=document.getElementById("startButton");
+let eventActive=true;
+let checkingActive=false;
 
 function lockPage(){
  namePage.classList.add("hidden");
@@ -79,7 +87,45 @@ function lockPage(){
  lockedPage.innerHTML="🔒 <strong>انتهت الفعالية</strong><br><br>تم الحصول على النقاط من طالب آخر 🏆<br><br>حظًا أوفر للجميع 🌟";
 }
 
-document.getElementById("startButton").onclick=function(){
+
+function showStoppedState(){
+ eventActive=false;
+ stoppedNotice.classList.remove("hidden");
+ nameInput.classList.add("hidden");
+ startButton.classList.add("hidden");
+ questionPage.classList.add("hidden");
+ finalPage.classList.add("hidden");
+ lockedPage.classList.add("hidden");
+ options.forEach(function(b){b.disabled=true;});
+}
+
+function showActiveState(){
+ eventActive=true;
+ stoppedNotice.classList.add("hidden");
+ nameInput.classList.remove("hidden");
+ startButton.classList.remove("hidden");
+ options.forEach(function(b){b.disabled=false;});
+}
+
+async function checkEventActive(){
+ if(checkingActive) return eventActive;
+ checkingActive=true;
+ try{
+  const {data,error}=await supabaseClient.rpc("get_event_active_grade1");
+  if(error) throw error;
+  if(data===true){showActiveState();}else{showStoppedState();}
+ }catch(error){
+  console.error("تعذر التحقق من حالة الفعالية:",error);
+ }
+ checkingActive=false;
+ return eventActive;
+}
+
+checkEventActive();
+setInterval(checkEventActive,5000);
+
+document.getElementById("startButton").onclick=async function(){
+ if(!(await checkEventActive()) || !eventActive){ showStoppedState(); return; }
  const name=nameInput.value.trim();
  const parts=name.split(/\s+/).filter(Boolean);
  if(parts.length!==3){
@@ -93,6 +139,8 @@ document.getElementById("startButton").onclick=function(){
 
 options.forEach(function(button){
  button.onclick=async function(){
+
+  if(!(await checkEventActive()) || !eventActive){ showStoppedState(); return; }
 
   options.forEach(function(b){
    b.disabled=true;
