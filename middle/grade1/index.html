@@ -21,8 +21,10 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 .final{text-align:center;padding:25px 5px}
 .final-icon{font-size:55px}.final h2{font-size:31px;margin:8px 0}.final p{font-size:22px;line-height:1.8}
 .locked{background:#fff0f0;border-radius:18px;padding:25px;text-align:center;line-height:2;font-size:20px}
-.stopped{margin:18px 0;padding:22px 14px;background:#fff0f0;border:1px solid #f5caca;border-radius:18px;text-align:center;color:#8b3030;line-height:1.8}
-.sad-face{font-size:54px;display:block;animation:sadBounce 1.8s ease-in-out infinite}
+.stopped{margin:18px 0;padding:18px 14px;background:linear-gradient(145deg,#fff8e8,#fff0f0);border:5px solid #edc96f;border-radius:42px;text-align:center;color:#79582a;line-height:1.7;box-shadow:0 12px 28px #edc96f33}
+.sad-face{font-size:76px;display:block;margin:0 0 10px;animation:sadBounce 1.8s ease-in-out infinite}
+.stopped strong{display:block;font-size:25px;margin:8px 0 12px}
+.stopped .stopped-subtitle{font-size:20px;display:block;margin-top:4px}
 @keyframes sadBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 </style>
 </head>
@@ -37,7 +39,7 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 ابتدائية سهل بن عدي الأنصاري<br>
 ومتوسطة عاقل بن البكير
 </p>
-<div id="stoppedNotice" class="stopped hidden"><span class="sad-face">😔</span><strong>الفعالية متوقفة حاليًا</strong><br>نرجو متابعة الإعلانات لمعرفة موعد عودتها.</div>
+<div id="stoppedNotice" class="stopped hidden"><span class="sad-face">😔</span><strong>الفعالية متوقفة حاليًا ⏸️</strong><span class="stopped-subtitle">🌟 ننتظركم قريبًا في تحدٍ جديد!</span></div>
 <input id="studentName" type="text" placeholder="اكتب الاسم الثلاثي" autocomplete="off">
 <button id="startButton" class="main-btn" type="button">ابدأ الفعالية 🚀</button>
 </div>
