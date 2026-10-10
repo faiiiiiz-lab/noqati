@@ -23,6 +23,9 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 .locked{background:#fff0f0;border-radius:18px;padding:25px;text-align:center;line-height:2;font-size:20px}
 .stopped{background:linear-gradient(135deg,#fff8e9,#fff0f0);border:3px solid #efc66d;border-radius:24px;padding:25px;text-align:center;line-height:2;color:#79521b;font-size:20px;box-shadow:0 8px 25px #efc66d33}
 .stop-icon{font-size:58px;margin-bottom:8px}.stopped p{margin:10px 0 0;font-size:18px}
+.preview-btn{display:block;width:100%;margin-top:18px;padding:12px;border:1px solid #d7ad43;border-radius:12px;background:#fff;color:#79521b;font-size:16px;font-weight:bold}
+.preview-note{background:#fff8df;border:2px dashed #d7ad43;border-radius:12px;padding:12px;margin-bottom:16px;color:#79521b;font-size:16px;line-height:1.8}
+.option.preview-correct{border:3px solid #18864b;background:#e8fff0;font-weight:bold}
 </style>
 </head>
 <body>
@@ -81,12 +84,55 @@ const nameInput=document.getElementById("studentName");
 const options=document.querySelectorAll(".option");
 const sendButton=document.getElementById("sendButton");
 
+let teacherPreviewMode=false;
 function showStoppedPage(){
+ teacherPreviewMode=false;
  namePage.classList.add("hidden");
  questionPage.classList.add("hidden");
  finalPage.classList.add("hidden");
  lockedPage.classList.add("hidden");
+ const canPreview=new URLSearchParams(window.location.search).get("preview")==="262626";
+ stoppedPage.innerHTML='<div class="stop-icon">😔</div><strong>⏸️ الفعالية متوقفة حاليًا</strong><p>🌟 ننتظركم قريبًا في تحدٍ جديد!</p>'+(canPreview?'<button id="teacherPreviewButton" class="preview-btn" type="button">👁️ معاينة السؤال للمعلم</button>':'');
  stoppedPage.classList.remove("hidden");
+ const previewButton=document.getElementById("teacherPreviewButton");
+ if(previewButton) previewButton.onclick=function(){
+  teacherPreviewMode=true;
+  stoppedPage.classList.add("hidden");
+  namePage.classList.add("hidden");
+  finalPage.classList.add("hidden");
+  lockedPage.classList.add("hidden");
+  questionPage.classList.remove("hidden");
+  let note=document.getElementById("teacherPreviewNote");
+  if(!note){
+   note=document.createElement("div");
+   note.id="teacherPreviewNote";
+   note.className="preview-note";
+   questionPage.insertBefore(note,questionPage.firstChild);
+  }
+  const correctOption=Array.from(options).find(b=>b.dataset.correct==="yes");
+  note.innerHTML="👁️ <strong>وضع معاينة المعلم</strong><br>الإجابة الصحيحة: <strong>"+(correctOption?correctOption.textContent:"غير محددة")+"</strong><br>هذه المعاينة لا تسجّل نقاطًا ولا تفتح الفعالية.";
+  options.forEach(b=>{
+   b.disabled=true;
+   b.classList.toggle("preview-correct",b.dataset.correct==="yes");
+  });
+  let back=document.getElementById("exitTeacherPreview");
+  if(!back){
+   back=document.createElement("button");
+   back.id="exitTeacherPreview";
+   back.className="preview-btn";
+   back.type="button";
+   back.textContent="العودة إلى شاشة الإيقاف";
+   questionPage.appendChild(back);
+  }
+  back.onclick=function(){
+   teacherPreviewMode=false;
+   options.forEach(b=>{b.disabled=false;b.classList.remove("preview-correct")});
+   questionPage.classList.add("hidden");
+   note.remove();
+   back.remove();
+   showStoppedPage();
+  };
+ };
 }
 async function checkEventActive(){
  namePage.classList.add("hidden");
@@ -133,6 +179,8 @@ document.getElementById("startButton").onclick=function(){
 
 options.forEach(function(button){
  button.onclick=async function(){
+
+  if(teacherPreviewMode){ return; }
 
   options.forEach(function(b){
    b.disabled=true;
