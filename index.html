@@ -18,6 +18,9 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 .option{display:block;width:100%;padding:15px;margin:9px 0;border:2px solid #d9e5ea;border-radius:14px;background:#f6f9fb;color:#17324d;text-align:right;font-size:18px}
 .option:disabled{opacity:.65}
 .hidden{display:none!important}
+.preview-btn{display:block;width:100%;margin-top:14px;padding:12px;border:1px solid #d7ad43;border-radius:12px;background:#fff;color:#79521b;font-size:16px;font-weight:bold}
+.preview-note{background:#fff8df;border:2px dashed #d7ad43;border-radius:12px;padding:12px;margin-bottom:16px;color:#79521b;font-size:16px;line-height:1.8}
+.option.preview-correct{border:3px solid #18864b;background:#e8fff0;font-weight:bold}
 .final{text-align:center;padding:25px 5px}
 .final-icon{font-size:55px}.final h2{font-size:31px;margin:8px 0}.final p{font-size:22px;line-height:1.8}
 .locked{background:#fff0f0;border-radius:18px;padding:25px;text-align:center;line-height:2;font-size:20px}
@@ -74,8 +77,10 @@ const options=document.querySelectorAll(".option");
 const sendButton=document.getElementById("sendButton");
 const startButton=document.getElementById("startButton");
 const eventStoppedMessage=document.getElementById("eventStoppedMessage");
+let teacherPreviewMode=false;
 
 function showStoppedEvent(){
+ teacherPreviewMode=false;
  questionPage.classList.add("hidden");
  finalPage.classList.add("hidden");
  lockedPage.classList.add("hidden");
@@ -83,6 +88,31 @@ function showStoppedEvent(){
  nameInput.classList.add("hidden");
  startButton.classList.add("hidden");
  eventStoppedMessage.classList.remove("hidden");
+ const canPreview=new URLSearchParams(window.location.search).get("preview")==="262626";
+ let previewButton=document.getElementById("teacherPreviewButton");
+ if(previewButton) previewButton.remove();
+ if(canPreview){
+  previewButton=document.createElement("button");
+  previewButton.id="teacherPreviewButton";
+  previewButton.className="preview-btn";
+  previewButton.type="button";
+  previewButton.textContent="👁️ معاينة السؤال للمعلم";
+  eventStoppedMessage.appendChild(previewButton);
+  previewButton.onclick=function(){
+   teacherPreviewMode=true;
+   namePage.classList.add("hidden");
+   eventStoppedMessage.classList.add("hidden");
+   questionPage.classList.remove("hidden");
+   let note=document.getElementById("teacherPreviewNote");
+   if(!note){note=document.createElement("div");note.id="teacherPreviewNote";note.className="preview-note";questionPage.insertBefore(note,questionPage.firstChild);}
+   const correctOption=Array.from(options).find(b=>b.dataset.correct==="yes");
+   note.innerHTML="👁️ <strong>وضع معاينة المعلم</strong><br>الإجابة الصحيحة: <strong>"+(correctOption?correctOption.textContent:"غير محددة")+"</strong><br>هذه المعاينة لا تسجّل نقاطًا ولا تفتح الفعالية.";
+   options.forEach(b=>{b.disabled=true;b.classList.toggle("preview-correct",b.dataset.correct==="yes");});
+   let back=document.getElementById("exitTeacherPreview");
+   if(!back){back=document.createElement("button");back.id="exitTeacherPreview";back.className="preview-btn";back.type="button";back.textContent="العودة إلى شاشة الإيقاف";questionPage.appendChild(back);}
+   back.onclick=function(){teacherPreviewMode=false;options.forEach(b=>{b.disabled=false;b.classList.remove("preview-correct")});questionPage.classList.add("hidden");note.remove();back.remove();showStoppedEvent();};
+  };
+ }
 }
 
 function showActiveEvent(){
@@ -138,6 +168,8 @@ document.getElementById("startButton").onclick=async function(){
 
 options.forEach(function(button){
  button.onclick=async function(){
+
+  if(teacherPreviewMode) return;
 
   options.forEach(function(b){
    b.disabled=true;
