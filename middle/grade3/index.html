@@ -82,6 +82,7 @@ const lockedPage=document.getElementById("lockedPage");
 const nameInput=document.getElementById("studentName");
 const options=document.querySelectorAll(".option");
 const sendButton=document.getElementById("sendButton");
+const teacherPreviewRequested = new URLSearchParams(window.location.search).get("preview") === "262626";
 
 let eventActive = true;
 
@@ -92,7 +93,7 @@ function showStoppedPage(){
  nameInput.classList.add("hidden"); document.getElementById("startButton").classList.add("hidden");
  lockedPage.classList.remove("hidden");
  lockedPage.innerHTML='<div class="sad-face">😔</div><p class="lock-title">الفعالية متوقفة حاليًا ⏸️</p><p class="lock-subtitle">🌟 ننتظركم قريبًا في تحدٍ جديد!</p>';
- if(new URLSearchParams(location.search).get("preview")==="262626"){
+ if(teacherPreviewRequested){
   const b=document.createElement("button");b.className="preview-btn";b.type="button";b.textContent="👁️ معاينة السؤال للمعلم";lockedPage.appendChild(b);
   b.onclick=function(){
    teacherPreviewMode=true;lockedPage.classList.add("hidden");namePage.classList.add("hidden");questionPage.classList.remove("hidden");
@@ -106,6 +107,7 @@ function showStoppedPage(){
 }
 async function checkEventActive(){
  if(teacherPreviewMode)return;
+ if(teacherPreviewRequested){showStoppedPage();return;}
  try{const {data,error}=await supabaseClient.rpc("get_event_active_grade3");if(error){console.error(error);return;}eventActive=data===true;
   if(!eventActive)showStoppedPage();else{lockedPage.classList.add("hidden");nameInput.classList.remove("hidden");document.getElementById("startButton").classList.remove("hidden");}
  }catch(error){console.error(error)}
