@@ -20,7 +20,25 @@ input{display:block;width:100%;padding:16px;border:2px solid #d9e5ea;border-radi
 .hidden{display:none!important}
 .final{text-align:center;padding:25px 5px}
 .final-icon{font-size:55px}.final h2{font-size:31px;margin:8px 0}.final p{font-size:22px;line-height:1.8}
-.locked{background:#fff0f0;border-radius:18px;padding:25px;text-align:center;line-height:2;font-size:20px}
+.locked{
+ background:linear-gradient(145deg,#fff8e8 0%,#fff0ed 100%);
+ border:6px solid #edcc72;
+ border-radius:48px;
+ padding:28px 18px;
+ text-align:center;
+ line-height:1.8;
+ font-size:20px;
+ color:#795c32;
+ box-shadow:0 10px 25px #edcc7226;
+ margin:0 auto;
+}
+.locked .sad-face{font-size:78px;line-height:1.35;margin:0 0 24px}
+.locked .lock-title{font-size:25px;font-weight:bold;margin:0 0 24px}
+.locked .lock-subtitle{font-size:22px;margin:0}
+#lockedPage{display:none}
+#lockedPage:not(.hidden){display:block}
+#namePage h1,#namePage .subtitle,#namePage .schools{display:block}
+@media(max-width:420px){.locked{border-width:5px;border-radius:42px;padding:24px 14px}.locked .sad-face{font-size:72px}.locked .lock-title{font-size:23px}.locked .lock-subtitle{font-size:21px}}
 </style>
 </head>
 <body>
@@ -71,15 +89,46 @@ const nameInput=document.getElementById("studentName");
 const options=document.querySelectorAll(".option");
 const sendButton=document.getElementById("sendButton");
 
-function lockPage(){
- namePage.classList.add("hidden");
+let eventActive = true;
+
+function showStoppedPage(){
  questionPage.classList.add("hidden");
  finalPage.classList.add("hidden");
+ nameInput.classList.add("hidden");
+ document.getElementById("startButton").classList.add("hidden");
  lockedPage.classList.remove("hidden");
- lockedPage.innerHTML="🔒 <strong>انتهت الفعالية</strong><br><br>تم الحصول على النقاط من طالب آخر 🏆<br><br>حظًا أوفر للجميع 🌟";
+ lockedPage.innerHTML = '<div class="sad-face">😔</div><p class="lock-title">الفعالية متوقفة حاليًا ⏸️</p><p class="lock-subtitle">🌟 ننتظركم قريبًا في تحدٍ جديد!</p>';
 }
 
+function lockPage(){
+ questionPage.classList.add("hidden");
+ finalPage.classList.add("hidden");
+ nameInput.classList.add("hidden");
+ document.getElementById("startButton").classList.add("hidden");
+ lockedPage.classList.remove("hidden");
+ lockedPage.innerHTML = '<div class="sad-face">😔</div><p class="lock-title">الفعالية متوقفة حاليًا ⏸️</p><p class="lock-subtitle">🌟 ننتظركم قريبًا في تحدٍ جديد!</p>';
+}
+
+async function checkEventActive(){
+ try {
+  const {data,error}=await supabaseClient.rpc("get_event_active_grade3");
+  if(error) { console.error(error); return; }
+  eventActive = data === true;
+  if(!eventActive) {
+   showStoppedPage();
+  } else {
+   lockedPage.classList.add("hidden");
+   nameInput.classList.remove("hidden");
+   document.getElementById("startButton").classList.remove("hidden");
+  }
+ } catch(error) { console.error(error); }
+}
+
+checkEventActive();
+setInterval(checkEventActive,5000);
+
 document.getElementById("startButton").onclick=function(){
+ if(!eventActive){ showStoppedPage(); return; }
  const name=nameInput.value.trim();
  const parts=name.split(/\s+/).filter(Boolean);
  if(parts.length!==3){
