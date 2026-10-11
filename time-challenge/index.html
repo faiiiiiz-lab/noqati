@@ -197,6 +197,12 @@ input,select{width:100%;padding:7px 10px;min-height:39px;border:1px solid #cbdce
 @keyframes celebrateArm{0%,18%{transform:rotate(0)}35%,75%{transform:rotate(-72deg)}100%{transform:rotate(-58deg)}}
 @keyframes celebrateArmBack{0%,18%{transform:rotate(0)}35%,75%{transform:rotate(42deg)}100%{transform:rotate(28deg)}}
 
+
+#challengeStopped{display:none;position:fixed;inset:0;z-index:99999;background:rgba(8,46,89,.28);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);align-items:center;justify-content:center;padding:24px;text-align:center;color:#fff;font-family:Tahoma,Arial,sans-serif}
+#challengeStopped .stopped-card{width:min(100%,520px);padding:26px 22px;border-radius:22px;background:rgba(12,48,83,.78);border:1px solid rgba(255,255,255,.45);box-shadow:0 14px 40px rgba(0,0,0,.24)}
+#challengeStopped .stopped-icon{font-size:56px;margin-bottom:14px}
+#challengeStopped h2{font-size:clamp(25px,6vw,36px);margin:0 0 14px;color:#fff}
+#challengeStopped p{font-size:18px;line-height:1.9;margin:0;color:#fff}
 </style>
 <style>
 /* High-quality 3D sprite replacement for running and celebrating; SVG remains for the disappointed seated pose. */
@@ -299,6 +305,7 @@ input,select{width:100%;padding:7px 10px;min-height:39px;border:1px solid #cbdce
 
 </head>
 <body>
+<div id="challengeStopped" role="status" aria-live="polite"><div class="stopped-card"><div class="stopped-icon">⏸️</div><h2>المسابقة متوقفة حاليًا</h2><p>نعتذر، تم إيقاف المشاركة مؤقتًا.<br>تابع إعلان المدرسة عند إعادة فتح المسابقة.</p></div></div>
 <main class="card">
  <header class="hero">
   <div class="schools">ابتدائية سهل بن عدي الأنصاري<br>متوسطة عاقل بن البكير</div>
@@ -393,6 +400,21 @@ function tone(freq=700,duration=.09,volume=.045,wave="sine"){try{audioCtx=audioC
 function soundSequence(notes,gap=120){notes.forEach(([f,d,v,w],i)=>setTimeout(()=>tone(f,d,v,w),i*gap))}
 function showFeedback(message,type){feedback.className="";feedback.style.display="block";feedback.classList.add(type);feedback.textContent=message}
 async function rpc(name,body){const response=await fetch(SUPABASE_URL+"/rest/v1/rpc/"+name,{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY},body:JSON.stringify(body)});let data=null;try{data=await response.json()}catch(e){}if(!response.ok){const msg=data?.message||data?.hint||"تعذر الاتصال بقاعدة البيانات";throw new Error(msg)}return data}
+async function checkChallengeStatus(){
+ const stopped=document.getElementById("challengeStopped");
+ try{
+  const status=await rpc("time_challenge_public_status",{});
+  if(status && status.is_active===false){
+   entryPage.style.display="block";
+   questionPage.style.display="none";
+   resultPage.style.display="none";
+   stopped.style.display="flex";
+   return false;
+  }
+ }catch(e){console.error("تعذر التحقق من حالة المسابقة:",e)}
+ return true;
+}
+checkChallengeStatus();
 function showCorrectOption(index){const buttons=optionsBox.querySelectorAll(".option");buttons.forEach((b,i)=>{b.disabled=true;if(i===index)b.classList.add("correct")})}
 async function finishAttempt(answerIndex,reason){if(questionLocked||!currentAttemptId)return;questionLocked=true;clearInterval(timerId);timerFinished=true;selectedIndex=answerIndex;optionsBox.querySelectorAll(".option").forEach(b=>b.disabled=true);try{const result=await rpc("finish_time_challenge",{p_attempt_id:currentAttemptId,p_selected_index:answerIndex,p_reason:reason});const row=Array.isArray(result)?result[0]:result;if(row?.is_correct){showCorrectOption(answerIndex);showFeedback("🎉 إجابة صحيحة، أحسنت!","success");coach("🏆 أحسنت!","good");if(mascot){mascot.classList.remove("runner","try","timeout");mascot.classList.add("good")}soundSequence([[660,.12,.075],[880,.16,.075],[1100,.22,.075]],140);timeHint.textContent="ممتاز! إجابة صحيحة 👏";setTimeout(()=>{questionPage.style.display="none";resultPage.style.display="flex";document.getElementById("studentResultName").textContent=currentStudentName;const sendBtn=document.getElementById("sendResultBtn");const phone="966565441887";const message="مشاركة تحدي الوقت\nأحسنت يا "+currentStudentName+"\nحصلت على نقطتين";sendBtn.href="https://wa.me/"+phone+"?text="+encodeURIComponent(message);sendBtn.style.display="inline-block";document.getElementById("sentResult").style.display="none"},1600)}else{const correctIndex=Number(row?.correct_index??-1);showCorrectOption(correctIndex);const msg=reason==="timeout"?"انتهى الوقت.":"إجابة غير صحيحة.";showFeedback(msg+(row?.correct_answer?" الإجابة الصحيحة: "+row.correct_answer+".":""),reason==="timeout"?"timeout":"fail");coach("انتهت المحاولة، فقدت فرصتك","try");if(mascot){mascot.classList.remove("runner","good","timeout");mascot.classList.add("try")}timeHint.textContent="انتهت المحاولة؛ تظهر الإجابة الصحيحة باللون الأخضر.";soundSequence([[330,.18,.07],[260,.22,.065]],170)}}catch(e){showFeedback("تعذر حفظ المحاولة في قاعدة البيانات. لا تغلق الصفحة، وأبلغ رائد النشاط.","fail");console.error(e)}}
 function renderQuestion(q){currentQuestion=q;document.getElementById("question").textContent=q.question_text;optionsBox.replaceChildren();feedback.style.display="none";q.choices.forEach((choice,index)=>{const b=document.createElement("button");b.className="option";b.type="button";b.textContent=choice;b.addEventListener("click",()=>{if(timerFinished||questionLocked)return;b.classList.add("selected");finishAttempt(index,"answered")});optionsBox.appendChild(b)})}
@@ -402,7 +424,7 @@ function getTimeChallengeDeviceId(){
  try{let id=localStorage.getItem(key);if(!id){id=(crypto.randomUUID?crypto.randomUUID():"dev-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2));localStorage.setItem(key,id)}return id}
  catch(e){let id=sessionStorage.getItem(key);if(!id){id="dev-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2);sessionStorage.setItem(key,id)}return id}
 }
-document.getElementById("startBtn").addEventListener("click",async()=>{if(questionLocked)return;const name=document.getElementById("student").value.trim().replace(/\s+/g," ");const parts=name.split(" ").filter(Boolean);const grade=document.getElementById("grade").value;if(!name){alert("اكتب اسم الطالب الثلاثي أولًا.");return}if(parts.length!==3){alert("لازم تكتب اسمك الثلاثي من ثلاثة أجزاء قبل بدء التحدي.");document.getElementById("student").focus();return}if(!grade){alert("اختر الصف الدراسي أولًا.");return}const btn=document.getElementById("startBtn");btn.disabled=true;const old=btn.textContent;btn.textContent="جارٍ التحقق…";try{const result=await rpc("start_time_challenge",{p_student_name:name,p_grade:grade,p_device_id:getTimeChallengeDeviceId()});const row=Array.isArray(result)?result[0]:result;if(!row||row.error)throw new Error(row?.error||"لم تصل بيانات السؤال");if(row.already_played){alert("سبق لك المشاركة، لا يمكنك المشاركة مرة أخرى هذا الأسبوع.");return}currentStudentName=name;currentAttemptId=row.attempt_id;document.getElementById("student").value=name;document.getElementById("studentResultName").textContent=name;document.getElementById("studentInfo").textContent="الطالب: "+name+" — الصف: "+grade;entryPage.style.display="none";questionPage.style.display="block";renderQuestion({question_text:row.question_text,choices:row.choices});startTimer()}catch(e){console.error(e);alert("تعذر بدء التحدي من قاعدة البيانات. تأكد من تنفيذ ملف إعداد Supabase أولًا.\n\n"+e.message)}finally{btn.disabled=false;btn.textContent=old}});
+document.getElementById("startBtn").addEventListener("click",async()=>{if(questionLocked)return;const stillActive=await checkChallengeStatus();if(!stillActive)return;const name=document.getElementById("student").value.trim().replace(/\s+/g," ");const parts=name.split(" ").filter(Boolean);const grade=document.getElementById("grade").value;if(!name){alert("اكتب اسم الطالب الثلاثي أولًا.");return}if(parts.length!==3){alert("لازم تكتب اسمك الثلاثي من ثلاثة أجزاء قبل بدء التحدي.");document.getElementById("student").focus();return}if(!grade){alert("اختر الصف الدراسي أولًا.");return}const btn=document.getElementById("startBtn");btn.disabled=true;const old=btn.textContent;btn.textContent="جارٍ التحقق…";try{const result=await rpc("start_time_challenge",{p_student_name:name,p_grade:grade,p_device_id:getTimeChallengeDeviceId()});const row=Array.isArray(result)?result[0]:result;if(!row||row.error)throw new Error(row?.error||"لم تصل بيانات السؤال");if(row.already_played){alert("سبق لك المشاركة، لا يمكنك المشاركة مرة أخرى هذا الأسبوع.");return}currentStudentName=name;currentAttemptId=row.attempt_id;document.getElementById("student").value=name;document.getElementById("studentResultName").textContent=name;document.getElementById("studentInfo").textContent="الطالب: "+name+" — الصف: "+grade;entryPage.style.display="none";questionPage.style.display="block";renderQuestion({question_text:row.question_text,choices:row.choices});startTimer()}catch(e){console.error(e);if((e.message||"").includes("المسابقة متوقفة")){entryPage.style.display="block";questionPage.style.display="none";resultPage.style.display="none";document.getElementById("challengeStopped").style.display="flex"}else{alert("تعذر بدء التحدي من قاعدة البيانات. تأكد من تنفيذ ملف إعداد Supabase أولًا.\n\n"+e.message)}}finally{btn.disabled=false;btn.textContent=old}});
 </script>
 </body>
 </html>
