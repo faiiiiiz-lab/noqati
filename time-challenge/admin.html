@@ -1,0 +1,122 @@
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>إدارة تحدي الوقت | نقاطي</title>
+<style>
+body{font-family:Tahoma,Arial;background:#eef4fb;color:#123b69;margin:0;padding:20px}
+main{max-width:480px;margin:30px auto;background:white;padding:24px;border-radius:18px;box-shadow:0 8px 28px #123b6920}
+h2{text-align:center}
+p{line-height:1.8}
+input,button{box-sizing:border-box;width:100%;padding:14px;margin:8px 0;border-radius:10px;font:inherit}
+input{border:1px solid #ccd6e2}
+button{border:0;color:white;font-weight:bold}
+#login{background:#0868bd}
+#start{background:#16803c}
+#stop{background:#b42318}
+#reset{background:#8b5e00}
+#status{padding:14px;background:#f3f6fa;border-radius:10px;font-weight:bold}
+#controls{display:none}
+#msg{white-space:pre-wrap;line-height:1.8;margin-top:12px}
+</style>
+</head>
+<body>
+<main>
+<h2>لوحة إدارة تحدي الوقت</h2>
+<p>من هنا تستطيع تشغيل المسابقة أو إيقافها.</p>
+
+<section id="loginPanel">
+<label for="pass">رمز الإدارة</label>
+<input id="pass" type="password" inputmode="numeric" placeholder="أدخل رمز الإدارة">
+<button id="login">دخول والتحقق من الحالة</button>
+</section>
+
+<section id="controls">
+<div id="status">جارٍ تحميل الحالة...</div>
+<button id="start">تشغيل المسابقة</button>
+<button id="stop">إيقاف المسابقة</button>
+<button id="reset">تصفير المحاولات وفتح المسابقة</button>
+</section>
+
+<div id="msg" role="status"></div>
+</main>
+
+<script>
+const URL="https://apfyqlshgnocvbinosmb.supabase.co";
+const KEY="sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38";
+const $=id=>document.getElementById(id);
+let password="";
+
+async function rpc(name,body){
+ const r=await fetch(URL+"/rest/v1/rpc/"+name,{
+  method:"POST",
+  headers:{
+   "Content-Type":"application/json",
+   "apikey":KEY,
+   "Authorization":"Bearer "+KEY
+  },
+  body:JSON.stringify(body)
+ });
+ let d;
+ try{d=await r.json()}catch{d={}}
+ if(!r.ok)throw Error(d.message||d.details||"تعذر الاتصال بقاعدة البيانات.");
+ return Array.isArray(d)?d[0]:d;
+}
+
+function showStatus(active){
+ $("status").textContent=active
+ ? "🟢 المسابقة مفتوحة الآن"
+ : "⏸️ المسابقة متوقفة حاليًا";
+}
+
+async function login(){
+ password=$("pass").value;
+ $("msg").textContent="جارٍ التحقق...";
+ try{
+  const d=await rpc("admin_time_challenge_status",{p_password:password});
+  showStatus(d.is_active);
+  $("loginPanel").style.display="none";
+  $("controls").style.display="block";
+  $("msg").textContent="تم الدخول بنجاح.";
+ }catch(e){
+  $("msg").textContent="تعذر الدخول: "+e.message;
+ }
+}
+
+async function setActive(active){
+ $("msg").textContent="جارٍ تحديث حالة المسابقة...";
+ try{
+  const d=await rpc("admin_set_time_challenge_active",{
+   p_password:password,p_active:active
+  });
+  showStatus(d.is_active);
+  $("msg").textContent=active
+   ?"تم تشغيل المسابقة بنجاح."
+   :"تم إيقاف المسابقة بنجاح.";
+ }catch(e){
+  $("msg").textContent="تعذر التحديث: "+e.message;
+ }
+}
+
+async function resetAttempts(){
+ if(!confirm("تنبيه: سيتم حذف جميع محاولات تحدي الوقت. هل تريد المتابعة؟"))return;
+ $("msg").textContent="جارٍ تصفير المحاولات...";
+ try{
+  const d=await rpc("admin_reset_time_challenge",{p_password:password});
+  showStatus(true);
+  $("msg").textContent="تم تصفير المحاولات وفتح المسابقة. عدد المحاولات المحذوفة: "+(d.deleted_count??"تم");
+ }catch(e){
+  $("msg").textContent="تعذر التصفير: "+e.message;
+ }
+}
+
+$("login").onclick=login;
+$("start").onclick=()=>setActive(true);
+$("stop").onclick=()=>setActive(false);
+$("reset").onclick=resetAttempts;
+$("pass").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
+</script>
+</body>
+</html>
