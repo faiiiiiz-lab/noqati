@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ماستر نقاطي</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;padding:20px;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#edf4fa,#fff5dc);
+  font-family:Tahoma,Arial,sans-serif;color:#17324a
+}
+.card{
+  width:100%;max-width:460px;background:#fff;
+  padding:25px;border-radius:24px;
+  box-shadow:0 12px 40px #12263a20
+}
+.logo{
+  font-size:42px;text-align:center;margin-bottom:10px
+}
+h1{text-align:center;margin:0 0 8px;font-size:27px}
+p{text-align:center;color:#667788;line-height:1.8}
+label{display:block;font-weight:bold;margin:20px 0 8px}
+input{
+  width:100%;padding:14px;border:1px solid #ccd7e0;
+  border-radius:12px;font-size:17px
+}
+.buttons{display:grid;gap:12px;margin-top:16px}
+button{
+  border:0;border-radius:12px;padding:15px;
+  font-size:17px;font-weight:bold;color:white;cursor:pointer
+}
+button:disabled{opacity:.55}
+.open{background:#16845b}
+.stop{background:#b83737}
+#message{
+  margin-top:18px;padding:13px;border-radius:12px;
+  background:#f0f4f8;line-height:1.8;text-align:center;
+  overflow-wrap:anywhere
+}
+.note{font-size:12px}
+</style>
+</head>
+
+<body>
+<div class="card">
+  <div class="logo">🔐</div>
+  <h1>ماستر نقاطي</h1>
+  <p>لوحة التحكم بالفعاليات الست<br>فتح الكل أو إيقاف الكل</p>
+
+  <label for="secret">الرمز السري</label>
+  <input id="secret" type="password"
+    placeholder="أدخل الرمز السري"
+    autocomplete="current-password">
+
+  <div class="buttons">
+    <button class="open" id="openBtn">▶ فتح الفعاليات الست</button>
+    <button class="stop" id="stopBtn">⏸ إيقاف الفعاليات الست</button>
+  </div>
+
+  <div id="message" role="status" aria-live="polite">
+    أدخل الرمز السري ثم اختر الإجراء.
+  </div>
+
+  <p class="note">
+    تغيير حالة الفعاليات لا يمسح أسماء الطلاب أو النتائج أو النقاط.
+  </p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL =
+  "https://apfyqlshgnocvbinosmb.supabase.co";
+
+/* المفتاح العام للمشروع فقط، وليس service_role */
+const SUPABASE_ANON_KEY =
+  "sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+const secretInput = document.getElementById("secret");
+const message = document.getElementById("message");
+const buttons = [
+  document.getElementById("openBtn"),
+  document.getElementById("stopBtn")
+];
+
+function show(text, color) {
+  message.textContent = text;
+  message.style.color = color || "#17324a";
+}
+
+async function setEvents(active) {
+  const code = secretInput.value;
+
+  if (!code) {
+    show("أدخل الرمز السري أولًا.", "#b42323");
+    secretInput.focus();
+    return;
+  }
+
+  buttons.forEach(b => b.disabled = true);
+  show(active
+    ? "جارٍ فتح الفعاليات الست..."
+    : "جارٍ إيقاف الفعاليات الست...");
+
+  try {
+    const { data, error } = await db.rpc(
+      "master_control_events",
+      {
+        p_code: code,
+        p_active: active
+      }
+    );
+
+    if (error) throw error;
+
+    if (data === true) {
+      show(
+        active
+          ? "✅ تم فتح الفعاليات الست."
+          : "⏸️ تم إيقاف الفعاليات الست.",
+        "#16734b"
+      );
+      secretInput.value = "";
+    } else {
+      show("❌ الرمز غير صحيح أو إعداد الماستر غير مكتمل.", "#b42323");
+    }
+  } catch (err) {
+    console.error(err);
+    show(
+      "تعذّر تنفيذ الأمر. تأكد من إعداد SQL واسم الدالة في Supabase.",
+      "#b42323"
+    );
+  } finally {
+    buttons.forEach(b => b.disabled = false);
+  }
+}
+
+document.getElementById("openBtn").onclick =
+  () => setEvents(true);
+
+document.getElementById("stopBtn").onclick =
+  () => setEvents(false);
+
+secretInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") setEvents(true);
+});
+</script>
+</body>
+</html>
