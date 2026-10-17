@@ -105,13 +105,52 @@ function start(){
  document.querySelectorAll('.stage-screen').forEach(el=>el.classList.remove('active'));
  const el=document.getElementById(id);if(el)el.classList.add('active');
 }
+// إعداد Supabase: ضع المفتاح العام Publishable مكان النص فقط.
+const SUPABASE_URL = 'https://apfyqlshgnocvbinosmb.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'ضع_مفتاح_sb_publishable_هنا';
+async function registerWinner(studentName, grade){
+  if(!SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_')) {
+    throw new Error('لم يُضف مفتاح Supabase العام بعد.');
+  }
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/claim_event_winner`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_PUBLISHABLE_KEY,
+      'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
+    },
+    body: JSON.stringify({p_student_name: studentName, p_grade: grade})
+  });
+  const data = await response.json().catch(()=>({}));
+  if(!response.ok) throw new Error(data.message || data.error || 'تعذر تسجيل النتيجة في قاعدة البيانات.');
+  return data;
+}
 document.querySelectorAll('#question .opt').forEach(btn=>btn.onclick=()=>{
  if(document.querySelector('#question .opt').disabled)return;
  document.querySelectorAll('#question .opt').forEach(x=>x.disabled=true);
  if(btn.dataset.correct){
-   document.querySelector('#finalStudentName').textContent='أحسنت يا '+document.querySelector('#studentName').value.trim();
-   scratchCard.style.display='none';
-   document.querySelector('#finalScreen').classList.add('active');
+   const studentName=document.querySelector('#studentName').value.trim();
+   const grade=document.querySelector('#studentGrade').value.trim();
+   btn.disabled=true;
+   registerWinner(studentName,grade).then(result=>{
+     if(result.status==='winner'){
+       document.querySelector('#finalStudentName').textContent='أحسنت يا '+studentName;
+       scratchCard.style.display='none';
+       document.querySelector('#finalScreen').classList.add('active');
+     }else if(result.status==='full'){
+       alert('اكتمل العدد! حصل طلاب آخرون على النقاط، نتمنى لكم حظًا أوفر في مسابقات أخرى.');
+       document.querySelector('#result').style.display='block';
+       document.querySelector('#resultTitle').textContent='اكتمل العدد';
+       document.querySelector('#resultText').textContent='حصل طلاب آخرون على النقاط في هذه المرحلة.';
+     }else if(result.status==='duplicate'){
+       alert('تم تسجيل اسمك مسبقًا في هذه المرحلة.');
+     }else{
+       alert('تعذر اعتماد النتيجة. تأكد من الاسم والصف.');
+     }
+   }).catch(err=>{
+     console.error(err);
+     alert('لم يتم تسجيل النتيجة في قاعدة البيانات. تأكد من إضافة المفتاح العام وإعداد دالة Supabase قبل نشر الصفحة.');
+   });
  }else{
    document.querySelector('#result').style.display='block';
    document.querySelector('#resultTitle').textContent='محاولة جميلة!';
