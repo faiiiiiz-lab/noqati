@@ -121,8 +121,7 @@ input,select{width:100%;padding:7px 10px;min-height:39px;border:1px solid #cbdce
 
 #resultPage{display:none;text-align:center;padding:24px 18px 28px;min-height:320px;align-items:center;justify-content:center;flex-direction:column;gap:12px}
 #resultPage .trophy{font-size:68px;line-height:1.1;margin:0 0 2px}
-.send-result-btn{display:inline-block;margin:18px auto 8px;padding:14px 24px;border-radius:14px;background:#16864a;color:#fff;text-decoration:none;font-weight:900;font-size:18px;box-shadow:0 8px 18px #16864a24}
-#resultPage .success-title{font-size:32px;line-height:1.25;font-weight:900;color:#16864a;margin:0}
+#resultPage .success-title{font-size:clamp(25px,5vw,32px);line-height:1.4;font-weight:900;color:#16864a;margin:0}
 #resultPage .student-result{font-size:19px;font-weight:800;color:#173b5b;margin:0}
 #resultPage .points-result{font-size:19px;font-weight:900;color:#16864a;background:#e8f8ee;border-radius:13px;padding:10px 15px;width:100%;margin:4px 0}
 #resultPage .sent-result{display:none;font-size:15px;font-weight:900;color:#16864a;background:#e8f8ee;border:1px solid #b6e5c5;border-radius:11px;padding:10px;width:100%;margin-top:3px}
@@ -303,6 +302,24 @@ input,select{width:100%;padding:7px 10px;min-height:39px;border:1px solid #cbdce
 @keyframes legBackCalm{from{transform:translateY(-.6px) rotate(1.5deg)}to{transform:translateY(0) rotate(-1deg)}}
 </style>
 
+
+<style id="entry-boy-enhancement">
+.entry-boy-scene{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin:0 auto 8px;min-height:102px;overflow:hidden;position:relative}
+.entry-boy{position:relative;width:74px;height:78px;display:flex;align-items:flex-end;justify-content:center;animation:entryBoyStroll 4.8s ease-in-out infinite;transform-origin:50% 90%;filter:drop-shadow(0 4px 5px #123b5b20)}
+.entry-boy img{display:block!important;position:relative!important;inset:auto!important;width:100%;height:100%;object-fit:contain;object-position:center bottom;animation:entryBoyWalk 1.05s ease-in-out infinite!important;transform-origin:50% 90%}
+.entry-boy-shadow{position:absolute;bottom:0;left:20%;width:60%;height:6px;border-radius:50%;background:#173b5b25;animation:entryShadow 1.05s ease-in-out infinite;z-index:0}
+.entry-boy-caption{font-size:12px;font-weight:800;color:#1766a7;background:linear-gradient(100deg,#eef8ff,#f5f0ff);border:1px solid #d4e8fa;border-radius:999px;padding:5px 12px}
+@keyframes entryBoyStroll{0%,100%{transform:translateX(-22px)}50%{transform:translateX(22px)}}
+@keyframes entryBoyWalk{0%,100%{transform:translateY(0) rotate(-1deg) scale(1,1)}25%{transform:translateY(-1px) rotate(1deg) scale(1.01,.995)}50%{transform:translateY(0) rotate(0) scale(.995,1.005)}75%{transform:translateY(-1px) rotate(-1deg) scale(1.005,.995)}}
+@keyframes entryShadow{0%,100%{transform:scaleX(.9);opacity:.65}50%{transform:scaleX(1.05);opacity:.4}}
+.runner-track .mascot.runner:not(.good):not(.try):not(.timeout){animation:runnerStrideCalm .72s ease-in-out infinite!important}
+.runner-track .mascot.runner .hi-run{animation:runnerSpriteCalm .72s ease-in-out infinite!important}
+@keyframes runnerStrideCalm{0%,100%{translate:0 0;scale:1 1}50%{translate:0 -2px;scale:1.01 .995}}
+@keyframes runnerSpriteCalm{0%,100%{transform:translateY(0) rotate(-1deg) scale(1)}50%{transform:translateY(-2px) rotate(1deg) scale(1.005)}}
+@media(max-height:700px){.entry-boy-scene{min-height:82px;margin-bottom:4px}.entry-boy{width:62px;height:62px}.entry-boy-caption{font-size:11px;padding:4px 10px}}
+@media(prefers-reduced-motion:reduce){.entry-boy,.entry-boy img,.entry-boy-shadow,.runner-track .mascot.runner,.runner-track .mascot.runner .hi-run{animation:none!important}}
+</style>
+
 </head>
 <body>
 <div id="challengeStopped" role="status" aria-live="polite"><div class="stopped-card"><div class="stopped-icon">⏸️</div><h2>المسابقة متوقفة حاليًا</h2><p>نعتذر، تم إيقاف المشاركة مؤقتًا.<br>تابع إعلان المدرسة عند إعادة فتح المسابقة.</p></div></div>
@@ -314,6 +331,10 @@ input,select{width:100%;padding:7px 10px;min-height:39px;border:1px solid #cbdce
  </header>
 
  <section id="entryPage" class="content">
+  <div class="entry-boy-scene" aria-hidden="true">
+   <div id="entryBoy" class="entry-boy"><span class="entry-boy-shadow"></span></div>
+   <div class="entry-boy-caption">أهلًا بك! جاهز للتحدي؟</div>
+  </div>
   <label class="label" for="student">اسم الطالب الثلاثي</label>
   <input id="student" maxlength="100" placeholder="اكتب اسمك الثلاثي">
   <label class="label" for="grade">الصف الدراسي</label>
@@ -375,10 +396,9 @@ input,select{width:100%;padding:7px 10px;min-height:39px;border:1px solid #cbdce
 
  <section id="resultPage" class="content" aria-live="polite">
   <div class="trophy" aria-hidden="true">🏆</div>
-  <h2 class="success-title">أحسنت!</h2>
-  <div id="studentResultName" class="student-result">يا عبدالله</div>
+  <h2 class="success-title">أحسنت</h2>
+  <div id="studentResultName" class="student-result"></div>
   <div class="points-result">حصلت على نقطتين</div>
-  <a id="sendResultBtn" class="send-result-btn" href="#" target="_blank" rel="noopener">إرسال النتيجة</a><div id="sentResult" class="sent-result" style="display:none"></div>
  </section>
 
  <p class="design-note">فرصة واحدة للإجابة: عند الخطأ أو انتهاء الوقت تظهر الإجابة الصحيحة وتنتهي المحاولة.</p>
@@ -391,6 +411,16 @@ const entryPage=document.getElementById("entryPage"), questionPage=document.getE
 const optionsBox=document.getElementById("options"), secondsLabel=document.getElementById("seconds"), feedback=document.getElementById("feedback");
 const timerFace=document.getElementById("timer")||document.createElement("div"), timeBar=document.getElementById("timeBar"), timeHint=document.getElementById("timeHint"), coachPill=document.getElementById("coachPill"), mascot=document.getElementById("mascot"), runnerTrack=document.getElementById("runnerTrack"), runnerLine=runnerTrack?runnerTrack.querySelector(".track-line"):null;
 const runnerSeconds=document.getElementById("seconds");
+(function setupEntryBoy(){
+ const scene=document.getElementById("entryBoy");
+ const source=document.querySelector("#mascot .hi-run");
+ if(!scene||!source)return;
+ const sprite=source.cloneNode(true);
+ sprite.removeAttribute("id");
+ sprite.className="entry-boy-sprite";
+ sprite.alt="";
+ scene.appendChild(sprite);
+})();
 let audioCtx=null, remaining=10, timerId=null, timerFinished=false, currentStudentName="", currentAttemptId=null, currentQuestion=null, selectedIndex=null, questionLocked=false;
 function updateRunnerLineColor(secondsLeft){if(!runnerLine)return;const elapsed=Math.max(0,Math.min(10,10-Number(secondsLeft)));const redStart=100-elapsed*4;runnerLine.style.setProperty("--orange-end",Math.max(55,redStart)+"%");runnerLine.style.setProperty("--red-start",redStart+"%");}
 if(runnerTrack&&mascot){runnerTrack.appendChild(mascot);runnerTrack.appendChild(runnerSeconds)}
@@ -416,7 +446,7 @@ async function checkChallengeStatus(){
 }
 checkChallengeStatus();
 function showCorrectOption(index){const buttons=optionsBox.querySelectorAll(".option");buttons.forEach((b,i)=>{b.disabled=true;if(i===index)b.classList.add("correct")})}
-async function finishAttempt(answerIndex,reason){if(questionLocked||!currentAttemptId)return;questionLocked=true;clearInterval(timerId);timerFinished=true;selectedIndex=answerIndex;optionsBox.querySelectorAll(".option").forEach(b=>b.disabled=true);try{const result=await rpc("finish_time_challenge",{p_attempt_id:currentAttemptId,p_selected_index:answerIndex,p_reason:reason});const row=Array.isArray(result)?result[0]:result;if(row?.is_correct){showCorrectOption(answerIndex);showFeedback("🎉 إجابة صحيحة، أحسنت!","success");coach("🏆 أحسنت!","good");if(mascot){mascot.classList.remove("runner","try","timeout");mascot.classList.add("good")}soundSequence([[660,.12,.075],[880,.16,.075],[1100,.22,.075]],140);timeHint.textContent="ممتاز! إجابة صحيحة 👏";setTimeout(()=>{questionPage.style.display="none";resultPage.style.display="flex";document.getElementById("studentResultName").textContent=currentStudentName;const sendBtn=document.getElementById("sendResultBtn");const phone="966565441887";const message="مشاركة تحدي الوقت\nأحسنت يا "+currentStudentName+"\nحصلت على نقطتين";sendBtn.href="https://wa.me/"+phone+"?text="+encodeURIComponent(message);sendBtn.style.display="inline-block";document.getElementById("sentResult").style.display="none"},1600)}else{const correctIndex=Number(row?.correct_index??-1);showCorrectOption(correctIndex);const msg=reason==="timeout"?"انتهى الوقت.":"إجابة غير صحيحة.";showFeedback(msg+(row?.correct_answer?" الإجابة الصحيحة: "+row.correct_answer+".":""),reason==="timeout"?"timeout":"fail");coach("انتهت المحاولة، فقدت فرصتك","try");if(mascot){mascot.classList.remove("runner","good","timeout");mascot.classList.add("try")}timeHint.textContent="انتهت المحاولة؛ تظهر الإجابة الصحيحة باللون الأخضر.";soundSequence([[330,.18,.07],[260,.22,.065]],170)}}catch(e){showFeedback("تعذر حفظ المحاولة في قاعدة البيانات. لا تغلق الصفحة، وأبلغ رائد النشاط.","fail");console.error(e)}}
+async function finishAttempt(answerIndex,reason){if(questionLocked||!currentAttemptId)return;questionLocked=true;clearInterval(timerId);timerFinished=true;selectedIndex=answerIndex;optionsBox.querySelectorAll(".option").forEach(b=>b.disabled=true);try{const result=await rpc("finish_time_challenge",{p_attempt_id:currentAttemptId,p_selected_index:answerIndex,p_reason:reason});const row=Array.isArray(result)?result[0]:result;if(row?.is_correct){showCorrectOption(answerIndex);showFeedback("🎉 إجابة صحيحة، أحسنت!","success");coach("🏆 أحسنت!","good");if(mascot){mascot.classList.remove("runner","try","timeout");mascot.classList.add("good")}soundSequence([[660,.12,.075],[880,.16,.075],[1100,.22,.075]],140);timeHint.textContent="ممتاز! إجابة صحيحة 👏";setTimeout(()=>{questionPage.style.display="none";resultPage.style.display="flex";},1600)}else{const correctIndex=Number(row?.correct_index??-1);showCorrectOption(correctIndex);const msg=reason==="timeout"?"انتهى الوقت.":"إجابة غير صحيحة.";showFeedback(msg+(row?.correct_answer?" الإجابة الصحيحة: "+row.correct_answer+".":""),reason==="timeout"?"timeout":"fail");coach("انتهت المحاولة، فقدت فرصتك","try");if(mascot){mascot.classList.remove("runner","good","timeout");mascot.classList.add("try")}timeHint.textContent="انتهت المحاولة؛ تظهر الإجابة الصحيحة باللون الأخضر.";soundSequence([[330,.18,.07],[260,.22,.065]],170)}}catch(e){showFeedback("تعذر حفظ المحاولة في قاعدة البيانات. لا تغلق الصفحة، وأبلغ رائد النشاط.","fail");console.error(e)}}
 function renderQuestion(q){currentQuestion=q;document.getElementById("question").textContent=String(q.question_text||"").replace(/(^|\s)مراجعة(?=\s|[:：-]|$)/g," ").replace(/\s{2,}/g," ").trim();optionsBox.replaceChildren();feedback.style.display="none";q.choices.forEach((choice,index)=>{const b=document.createElement("button");b.className="option";b.type="button";b.textContent=choice;b.addEventListener("click",()=>{if(timerFinished||questionLocked)return;b.classList.add("selected");finishAttempt(index,"answered")});optionsBox.appendChild(b)})}
 function startTimer(){clearInterval(timerId);remaining=10;timerFinished=false;questionLocked=false;moveRunner(0);secondsLabel.textContent="١٠";updateRunnerLineColor(10);coach("🏃‍♂️ يلا انطلق!","");timerFace.style.setProperty("--progress",100);timerFace.classList.remove("urgent","critical");secondsLabel.classList.remove("urgent","critical");timeBar.style.width="0%";timeHint.textContent="انطلق! ركّز واختر الإجابة";soundSequence([[660,.12,.075],[880,.16,.075]],180);timerId=setInterval(()=>{remaining--;secondsLabel.textContent=String(remaining).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);moveRunner((10-remaining)/10);updateRunnerLineColor(remaining);timerFace.style.setProperty("--progress",remaining*10);timerFace.classList.toggle("urgent",remaining<=5&&remaining>3);timerFace.classList.toggle("critical",remaining<=3);secondsLabel.classList.toggle("urgent",remaining<=5&&remaining>3);secondsLabel.classList.toggle("critical",remaining<=3);if(remaining>0){tone(remaining<=3?1120:780,.10,remaining<=3?.12:.075,"sine");timeHint.textContent=remaining<=3?"باقي القليل! أسرع ⚡":"الوقت يمضي…";if(remaining<=3)coach("⚡ أسرع! بقي "+String(remaining).replace(/[0-9]/g,d=>"٠١٢٣٤٥٦٧٨٩"[d])+" ثوانٍ!","fast");else if(remaining<=6)coach("🔥 ممتاز، لا تتردد!","fast");else coach("🎯 ركّز واختر إجابتك!","")}if(remaining<=0){clearInterval(timerId);timeBar.style.width="0%";moveRunner(1);updateRunnerLineColor(0);timerFace.style.setProperty("--progress",0);timerFace.classList.remove("urgent");timerFace.classList.add("critical");timeHint.textContent="انتهى الوقت";coach("⏰ انتهت المحاولة، فقدت فرصتك","timeout");if(mascot)mascot.classList.add("timeout");soundSequence([[440,.16,.07],[330,.22,.07],[220,.3,.065]],190);finishAttempt(-1,"timeout")}},1000)}
 function getTimeChallengeDeviceId(){
