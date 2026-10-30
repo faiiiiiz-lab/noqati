@@ -1,1 +1,220 @@
 
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b766e">
+<title>وعي وتحدّي | شاهد وأجب</title>
+<style>
+:root{--teal:#0b766e;--teal2:#0f9488;--ink:#17333a;--muted:#63777b;--line:#dce9e7;--gold:#e5b85c}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,rgba(4,35,42,.48),rgba(7,79,75,.38)),url("school.jpg") center/cover fixed no-repeat;font-family:Tahoma,Arial,sans-serif;color:var(--ink);min-height:100vh;padding:clamp(6px,1.5vw,16px);overflow:hidden}
+.wrap{width:100%;max-width:900px;height:calc(100dvh - clamp(12px,3vw,32px));margin:0 auto;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;justify-content:center;gap:10px;margin:2px 0 7px;color:#fff;font-weight:700;font-size:13px;text-shadow:0 2px 8px rgba(0,0,0,.4);flex:0 0 auto}
+.brand .dot{width:9px;height:9px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 5px #e5b85c25}
+.card{background:rgba(255,255,255,.97);border:1px solid rgba(255,255,255,.65);border-radius:24px;overflow:hidden;box-shadow:0 20px 65px rgba(0,0,0,.25);flex:1;min-height:0;display:flex;flex-direction:column}
+.hero{height:clamp(90px,19vh,190px);flex:0 0 auto;background:#e1f1ee;overflow:hidden}
+.hero img{width:100%;height:100%;object-fit:cover;object-position:center 44%}
+.body{padding:clamp(10px,2.4vh,22px);flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.body section{min-height:0;flex:1;display:flex;flex-direction:column;overflow:hidden}
+.body section.hidden{display:none!important}
+h1{font-size:clamp(25px,5vw,36px);margin:0;text-align:center;color:var(--teal)}
+.subtitle{text-align:center;color:var(--muted);margin:5px 0 10px;line-height:1.5}
+.schools{text-align:center;font-size:14px;line-height:1.5;background:#f5faf9;border:1px solid var(--line);border-radius:14px;padding:7px;margin:0 0 8px}
+.field{display:block;margin:8px 0 4px;font-size:13px;font-weight:700}
+.input,select,textarea{font:inherit;width:100%;border:1px solid #cfdfdc;border-radius:12px;padding:11px 13px;background:#fff;color:var(--ink);outline:none}
+.input:focus,select:focus,textarea:focus{border-color:var(--teal2);box-shadow:0 0 0 3px #0f94881c}
+.btn{width:100%;border:0;border-radius:13px;padding:12px 16px;background:linear-gradient(110deg,var(--teal),var(--teal2));color:#fff;font:inherit;font-weight:700;cursor:pointer;margin-top:10px;flex:0 0 auto;box-shadow:0 8px 18px #0b766e25}
+.hidden{display:none!important}
+.note{font-size:12px;color:var(--muted);line-height:1.8;text-align:center;margin-top:7px}
+.section-title{text-align:center;font-size:clamp(18px,2.5vh,23px);color:var(--teal);margin:0 0 4px}
+.video-frame{aspect-ratio:16/9;flex:0 0 auto;margin:6px 0 8px;border-radius:16px;overflow:hidden;background:transparent}
+.video-frame video{display:block;width:100%;height:100%;object-fit:cover;background:transparent}
+.watch-note{text-align:center;color:var(--muted);font-size:12px;line-height:1.8}
+.question{background:#f2f9f7;border:1px solid #d6eae5;border-radius:16px;padding:clamp(10px,2vh,18px);line-height:1.5;font-size:clamp(16px,2.5vh,21px);font-weight:700;margin:8px 0;flex:0 0 auto}
+textarea{min-height:0;height:clamp(95px,24vh,210px);resize:none;line-height:1.9;font-size:18px;flex:1}
+.status{text-align:center;padding:12px;border-radius:12px;background:#f4faf9;color:var(--teal);line-height:1.8}
+.footer{text-align:center;color:#829392;font-size:10px;padding:6px 0 0;flex:0 0 auto}
+body.stage-intro .hero{height:clamp(105px,22vh,205px)}
+body.stage-question .hero,body.stage-result .hero{display:none}
+body.stage-video .hero{display:block;height:clamp(155px,25vh,255px)}
+body.stage-video .body,body.stage-question .body,body.stage-result .body{padding:clamp(12px,2.5vh,24px)}
+@media(max-height:650px){
+.hero{height:80px}
+body.stage-intro .hero{height:90px}
+.schools{font-size:12px}
+.subtitle{margin:3px 0 6px}
+.question{font-size:16px}
+textarea{height:90px}
+.footer{display:none}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+<div class="brand">
+<span class="dot"></span>
+<span>ضمن برنامج نقاطي</span>
+<span class="dot"></span>
+</div>
+
+<div class="card">
+<div class="hero">
+<img src="school.jpg" alt="صورة المدرسة">
+</div>
+
+<div class="body">
+<section id="intro">
+<h1>وعي وتحدّي</h1>
+<p class="subtitle">شاهد وأجب<br>بالتعاون مع فوكس جيم</p>
+
+<div class="schools">
+ابتدائية سهل بن عدي الأنصاري<br>
+ومتوسطة عاقل بن البكير
+</div>
+
+<label class="field" for="studentName">اسم الطالب الثلاثي</label>
+<input class="input" id="studentName" autocomplete="name" placeholder="اكتب اسمك الثلاثي" maxlength="100">
+
+<label class="field" for="grade">الصف الدراسي</label>
+<select id="grade">
+<option value="">اختر الصف</option>
+<option>الرابع الابتدائي</option>
+<option>الخامس الابتدائي</option>
+<option>السادس الابتدائي</option>
+<option>الأول المتوسط</option>
+<option>الثاني المتوسط</option>
+<option>الثالث المتوسط</option>
+</select>
+
+<button class="btn" id="start">ابدأ الفعالية</button>
+<p class="note">شاهد المقطع بتركيز؛ سيظهر السؤال بعد انتهاء الفيديو.</p>
+</section>
+
+<section id="videoSection" class="hidden">
+<h2 class="section-title">شاهد المقطع بتركيز</h2>
+<p class="subtitle">تأمل الرسالة والنصائح الواردة في الفيديو.</p>
+
+<div class="video-frame">
+<video id="video" controls playsinline preload="metadata">
+<source src="video.mp4" type="video/mp4">
+متصفحك لا يدعم تشغيل الفيديو.
+</video>
+</div>
+
+<div class="watch-note" id="watchStatus">سيظهر السؤال بعد اكتمال مشاهدة المقطع.</div>
+<button class="btn hidden" id="toQuestion">انتقل إلى السؤال</button>
+</section>
+
+<section id="questionSection" class="hidden">
+<h2 class="section-title">سؤال الفعالية</h2>
+
+<div class="question">
+ما الخطوة الأولى نحو ترفيه آمن وتعلّم مفيد عند اختيار الألعاب الإلكترونية؟
+</div>
+
+<label class="field" for="answer">اكتب إجابتك</label>
+<textarea class="input" id="answer" placeholder="اكتب إجابتك هنا" maxlength="180" autocomplete="off" rows="5"></textarea>
+
+<button class="btn" id="submit">إرسال الإجابة</button>
+<p class="note">تُقبل الإجابة الصحيحة والصيغ المكافئة لها.</p>
+</section>
+
+<section id="resultSection" class="hidden">
+<h2 class="section-title">شكرًا لمشاركتك!</h2>
+<div class="status" id="resultText"></div>
+<p class="note">هذه نسخة تجريبية للتصميم. لم يتم ربط حفظ النتائج بقاعدة البيانات بعد.</p>
+</section>
+</div>
+</div>
+
+<div class="footer">وعي وتحدّي · شاهد وأجب</div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+let student={};
+document.body.classList.add('stage-intro');
+
+const pages=['intro','videoSection','questionSection','resultSection'];
+
+function show(id){
+pages.forEach(p=>$(p).classList.toggle('hidden',p!==id));
+document.body.classList.remove('stage-intro','stage-video','stage-question','stage-result');
+document.body.classList.add('stage-'+({
+intro:'intro',
+videoSection:'video',
+questionSection:'question',
+resultSection:'result'
+}[id]));
+window.scrollTo(0,0);
+}
+
+$('start').addEventListener('click',()=>{
+const name=$('studentName').value.trim();
+const grade=$('grade').value;
+
+if(name.split(/\s+/).filter(Boolean).length<3){
+alert('فضلاً اكتب الاسم الثلاثي.');
+return;
+}
+if(!grade){
+alert('فضلاً اختر الصف الدراسي.');
+return;
+}
+
+student={name,grade};
+show('videoSection');
+$('video').currentTime=0;
+$('video').play().catch(()=>{});
+});
+
+$('video').addEventListener('ended',()=>{
+$('watchStatus').textContent='أحسنت! اكتملت مشاهدة المقطع. يمكنك الآن الانتقال إلى السؤال.';
+$('toQuestion').classList.remove('hidden');
+});
+
+$('toQuestion').addEventListener('click',()=>{
+show('questionSection');
+});
+
+function norm(s){
+return s.toLowerCase()
+.replace(/[أإآ]/g,'ا')
+.replace(/[ًٌٍَُِّْـ]/g,'')
+.replace(/[.,،؛:!?؟]/g,' ')
+.replace(/\s+/g,' ')
+.trim();
+}
+
+$('submit').addEventListener('click',()=>{
+const a=$('answer').value.trim();
+
+if(!a){
+alert('اكتب إجابتك أولاً.');
+return;
+}
+
+const n=norm(a);
+const accepted=[
+'اختيار اللعبة المناسبة',
+'اختيار الالعاب المناسبة',
+'اختيار لعبة مناسبة',
+'اختيار الالعاب المناسبة للعمر',
+'اختيار اللعبة الملائمة',
+'اللعبة المناسبة'
+].map(norm);
+
+const correct=accepted.includes(n);
+
+$('resultText').textContent=correct
+?'أحسنت! إجابتك صحيحة.'
+:'شكرًا لمشاركتك. تم تسجيل إجابتك في هذه النسخة التجريبية.';
+
+show('resultSection');
+});
+</script>
+</body>
+</html>
+
