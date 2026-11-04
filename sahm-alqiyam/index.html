@@ -65,8 +65,35 @@ svg{width:100%;height:100%;overflow:visible}
 @keyframes pp{50%{transform:scale(1.08)}}
 .big{font-size:64px;text-align:center;animation:bn .9s ease-in-out infinite alternate}@keyframes bn{to{transform:translateY(-10px) scale(1.1)}}
 .card.res{display:block;text-align:center;font-size:19px;line-height:1.75;padding:14px}.res b{color:var(--accent)}
-.toast{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%) translateY(-8px);width:max-content;max-width:calc(100vw - 32px);box-sizing:border-box;background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:16px;font-weight:800;font-size:clamp(14px,3.8vw,18px);line-height:1.5;text-align:center;white-space:normal;overflow-wrap:anywhere;opacity:0;transition:.25s;pointer-events:none;z-index:99;box-shadow:0 6px 18px #0003}
-.toast.on{opacity:1;transform:translateX(-50%)}
+/* رسالة التنبيه: عرض محكوم بالشاشة مع التفاف النص */
+.toast{
+  position:fixed;
+  top:calc(12px + env(safe-area-inset-top,0px));
+  left:16px;
+  right:16px;
+  width:auto;
+  max-width:480px;
+  margin-inline:auto;
+  transform:translateY(-8px);
+  box-sizing:border-box;
+  background:var(--ink);
+  color:var(--bg);
+  padding:10px 14px;
+  border-radius:14px;
+  font-weight:800;
+  font-size:clamp(13px,3.7vw,17px);
+  line-height:1.45;
+  text-align:center;
+  white-space:normal;
+  overflow-wrap:break-word;
+  word-break:normal;
+  opacity:0;
+  transition:opacity .2s,transform .2s;
+  pointer-events:none;
+  z-index:9999;
+  box-shadow:0 6px 18px #0003;
+}
+.toast.on{opacity:1;transform:translateY(0)}
 
 /* شاشة شرح اللعبة: تستغل مساحة الشاشة كاملة دون تمرير */
 #s-help{
