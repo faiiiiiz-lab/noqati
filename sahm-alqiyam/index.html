@@ -65,35 +65,8 @@ svg{width:100%;height:100%;overflow:visible}
 @keyframes pp{50%{transform:scale(1.08)}}
 .big{font-size:64px;text-align:center;animation:bn .9s ease-in-out infinite alternate}@keyframes bn{to{transform:translateY(-10px) scale(1.1)}}
 .card.res{display:block;text-align:center;font-size:19px;line-height:1.75;padding:14px}.res b{color:var(--accent)}
-/* رسالة التنبيه: عرض محكوم بالشاشة مع التفاف النص */
-.toast{
-  position:fixed;
-  top:calc(12px + env(safe-area-inset-top,0px));
-  left:16px;
-  right:16px;
-  width:auto;
-  max-width:480px;
-  margin-inline:auto;
-  transform:translateY(-8px);
-  box-sizing:border-box;
-  background:var(--ink);
-  color:var(--bg);
-  padding:10px 14px;
-  border-radius:14px;
-  font-weight:800;
-  font-size:clamp(13px,3.7vw,17px);
-  line-height:1.45;
-  text-align:center;
-  white-space:normal;
-  overflow-wrap:break-word;
-  word-break:normal;
-  opacity:0;
-  transition:opacity .2s,transform .2s;
-  pointer-events:none;
-  z-index:9999;
-  box-shadow:0 6px 18px #0003;
-}
-.toast.on{opacity:1;transform:translateY(0)}
+.toast{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%) translateY(-8px);background:var(--ink);color:var(--bg);padding:9px 18px;border-radius:999px;font-weight:800;opacity:0;transition:.25s;pointer-events:none;z-index:9;white-space:nowrap;box-shadow:0 6px 18px #0003}
+.toast.on{opacity:1;transform:translateX(-50%)}
 
 /* شاشة شرح اللعبة: تستغل مساحة الشاشة كاملة دون تمرير */
 #s-help{
@@ -109,16 +82,15 @@ svg{width:100%;height:100%;overflow:visible}
 #s-help .help{
   flex:1;
   min-height:0;
-  justify-content:space-around;
-  gap:clamp(5px,1vh,10px);
-  padding:clamp(9px,1.5vh,15px) clamp(12px,3vw,22px);
-  overflow:hidden;
+  justify-content:space-evenly;
+  gap:clamp(10px,2vh,22px);
+  padding:clamp(14px,2.8vh,28px) clamp(14px,3.5vw,24px);
 }
 #s-help .st{
   align-items:center;
-  gap:clamp(9px,2vw,16px);
-  font-size:clamp(16px,2.05vh,19px);
-  line-height:1.35;
+  gap:clamp(12px,2.5vw,18px);
+  font-size:clamp(17px,2.35vh,21px);
+  line-height:1.55;
 }
 #s-help .st b{
   width:clamp(32px,4.5vh,40px);
@@ -126,10 +98,10 @@ svg{width:100%;height:100%;overflow:visible}
   font-size:clamp(17px,2.2vh,20px);
 }
 #s-help #ok{flex:none}
-@media(max-height:760px){
+@media(max-height:650px){
   #s-help{gap:6px;padding-block:5px}
-  #s-help .help{gap:4px;padding:7px 10px}
-  #s-help .st{font-size:clamp(14px,2.15vh,17px);line-height:1.28}
+  #s-help .help{gap:6px;padding:8px 12px}
+  #s-help .st{font-size:clamp(15px,2.5vh,18px);line-height:1.35}
   #s-help .st b{width:28px;height:28px;font-size:15px}
   #s-help #ok{padding:10px;font-size:16px}
 }
@@ -192,7 +164,7 @@ svg{width:100%;height:100%;overflow:visible}
   <div class="big" id="eicon">🏆</div>
   <h1 id="etitle"></h1>
   <div class="card res" id="eres"></div>
-  <button class="btn" id="again">العب مرة أخرى</button>
+  
   <p class="credit">ابتدائية سهل بن عدي الأنصاري<br>متوسطة عاقل بن البكير</p>
 </section>
 </div>
@@ -453,6 +425,9 @@ async function supabaseRpc(fn, payload){
 async function canStudentPlay(name){
   return await supabaseRpc('can_play_sahm',{p_competition_id:COMPETITION_ID,p_student_name:name,p_device_id:getDeviceId()});
 }
+async function isCompetitionOpen(){
+  return await supabaseRpc('sahm_is_competition_open',{});
+}
 async function saveStudentResult(){
   return await supabaseRpc('submit_sahm_result',{
     p_competition_id:COMPETITION_ID,
@@ -494,28 +469,38 @@ function validStudentDetails(){
 async function start(){
   if(attemptCheckInProgress)return;
   if(!validStudentDetails())return;
+
   const btn=$('go');
   attemptCheckInProgress=true;
   participationAllowed=false;
   $('ok').disabled=true;
-  $('ok').textContent='جارٍ التحقق من المشاركة...';
-  $('help-status').textContent='يتم التحقق من إمكانية المشاركة، يمكنك قراءة التعليمات الآن.';
-  show('s-help');
+  $('ok').textContent='جارٍ التحقق من حالة المسابقة...';
+
   try{
+    const isOpen=await isCompetitionOpen();
+    if(isOpen!==true){
+      show('s-start');
+      toast('عفوًا، المسابقة مغلقة حاليًا.');
+      return;
+    }
+
+    $('ok').textContent='جارٍ التحقق من المشاركة...';
     const allowed=await canStudentPlay($('nm').value.trim());
     if(allowed!==true){
       show('s-start');
       toast('سبق لك المشاركة في هذه المسابقة، شكرًا لمشاركتك');
       return;
     }
+
     participationAllowed=true;
     $('ok').disabled=false;
     $('ok').textContent='فهمت، ابدأ اللعب';
     $('help-status').textContent='';
+    show('s-help');
   }catch(e){
     show('s-start');
-    toast('تعذر التحقق من المشاركة. تأكد من الاتصال وحاول مجددًا');
-    console.error('Supabase participation check:',e);
+    toast('تعذر التحقق من المسابقة. تأكد من الاتصال وحاول مجددًا');
+    console.error('Supabase competition check:',e);
   }finally{
     attemptCheckInProgress=false;
     if(btn)btn.disabled=false;
@@ -673,7 +658,7 @@ $('theme').onclick=()=>{const r=document.documentElement,d=r.getAttribute('data-
 $('back').onclick=()=>{clearInterval(S.ti);$('sheet').classList.remove('on','hurry');participationAllowed=false;show('s-start')};
 $('go').onclick=start;$('ok').onclick=begin;
 $('next').onclick=()=>{S.level=2;snd('tap');newLevel()};
-$('again').onclick=()=>{participationAllowed=false;show('s-start')};
+
 $('nm').addEventListener('input',()=>{participationAllowed=false});
 $('cl').addEventListener('change',()=>{participationAllowed=false});
 </script>
