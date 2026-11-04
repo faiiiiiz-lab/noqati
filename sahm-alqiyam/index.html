@@ -261,6 +261,17 @@ const COLS=15,ROWS=21,CS=22,NS_=[14,18],LEN=[[9,22],[6,15]],TIMES=[20,18],EXT=14
 let TIME=20;
 const $=id=>document.getElementById(id);
 let S={},AC=null,muted=false;
+// Supabase public client configuration (publishable key; database access is protected by RLS/RPC).
+const SUPABASE_URL='https://apfyqlshgnocvbinosmb.supabase.co';
+const SUPABASE_KEY='sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38';
+const COMPETITION_ID='sahm-alqiyam-2026';
+let attemptCheckInProgress=false;
+const DEVICE_ID_KEY='sahm_alqiyam_device_id_v1';
+function getDeviceId(){
+  let id=localStorage.getItem(DEVICE_ID_KEY);
+  if(!id){id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():('sahm-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2));localStorage.setItem(DEVICE_ID_KEY,id);}
+  return id;
+}
 const rnd=n=>Math.floor(Math.random()*n);
 const pick=a=>a[rnd(a.length)];
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -398,6 +409,33 @@ function drops(){const d=$('drops');d.innerHTML='';for(let i=0;i<3;i++){const e=
 function setScore(){$('sc').textContent='النقاط: '+S.points+' / 2';$('lv').textContent=S.level;$('dif').textContent=DIFF[S.level-1]}
 function setCombo(){const c=$('combo'),n=S.combo||0;if(n>=2){c.textContent='🔥 ×'+n;try{c.animate([{transform:'scale(1.6)'},{transform:'scale(1)'}],{duration:300})}catch(e){}}else c.textContent=''}
 
+/* ---------- حفظ المشاركة عبر Supabase ---------- */
+async function supabaseRpc(fn, payload){
+  const response=await fetch(SUPABASE_URL+'/rest/v1/rpc/'+fn,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},
+    body:JSON.stringify(payload)
+  });
+  let data=null;
+  try{data=await response.json()}catch(e){}
+  if(!response.ok)throw new Error(data?.message||data?.hint||'تعذر الاتصال بقاعدة البيانات');
+  return data;
+}
+async function canStudentPlay(name){
+  return await supabaseRpc('can_play_sahm',{p_competition_id:COMPETITION_ID,p_student_name:name,p_device_id:getDeviceId()});
+}
+async function saveStudentResult(){
+  return await supabaseRpc('submit_sahm_result',{
+    p_competition_id:COMPETITION_ID,
+    p_student_name:S.name,
+    p_device_id:getDeviceId(),
+    p_class_name:S.cls,
+    p_points:S.points,
+    p_correct_answers:S.right,
+    p_wrong_answers:S.wrong
+  });
+}
+
 /* ---------- سير اللعبة ---------- */
 function newLevel(){
   const [lo,hi]=LEN[S.level-1],arr=genChain(NS_[S.level-1],lo,hi);
@@ -424,16 +462,30 @@ function validStudentDetails(){
   $('nm').value=parts.join(' ');
   return true;
 }
-function start(){
+async function start(){
+  if(attemptCheckInProgress)return;
   if(!validStudentDetails())return;
-  show('s-help');
+  const btn=$('go');
+  attemptCheckInProgress=true;
+  try{
+    if(btn)btn.disabled=true;
+    const allowed=await canStudentPlay($('nm').value.trim());
+    if(allowed!==true){toast('سبق لك المشاركة في هذه المسابقة، شكرًا لمشاركتك');return}
+    show('s-help');
+  }catch(e){
+    toast('تعذر التحقق من المشاركة. تأكد من الاتصال بالإنترنت وحاول مجددًا');
+    console.error('Supabase participation check:',e);
+  }finally{
+    attemptCheckInProgress=false;
+    if(btn)btn.disabled=false;
+  }
 }
 function begin(){
   if(!validStudentDetails())return;
   S.name=$('nm').value.trim().replace(/\\s+/g,' ');S.cls=$('cl').value;
   try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}
   $('wn').textContent=S.name;$('wc').textContent=S.cls;
-  Object.assign(S,{points:0,level:1,hints:2,combo:0,right:0,wrong:0,clues:shuffle(BANK),bully:mixBully()});
+  Object.assign(S,{points:0,level:1,hints:2,combo:0,right:0,wrong:0,clues:shuffle(BANK),bully:mixBully(),resultSaved:false,finishStarted:false});
   $('hc').textContent=2;snd('tap');newLevel();
 }
 function tapArrow(a){
@@ -511,11 +563,24 @@ function levelDone(){
   if(S.level===1){$('ln').textContent=S.name;setTimeout(()=>show('s-lvl'),1300)}
   else setTimeout(finish,1500);
 }
-function finish(){
+async function finish(){
+  if(S.finishStarted)return;
+  S.finishStarted=true;
   show('s-end');const p=S.points;
   $('eicon').textContent=p===2?'🏆':p===1?'⭐':'💪';
   $('etitle').textContent=p===2?'ما شاء الله يا '+S.name+'!':p===1?'أحسنت يا '+S.name:'حاول مرة أخرى يا '+S.name;
-  $('eres').innerHTML='الطالب: <b>'+esc(S.name)+'</b><br>الصف: <b>'+esc(S.cls)+'</b><br>المجموع: <b>'+p+' / 2</b> '+'⭐'.repeat(p)+'<br>إجابات صحيحة: <b>'+S.right+'</b> — خاطئة: <b>'+S.wrong+'</b>';
+  $('eres').innerHTML='الطالب: <b>'+esc(S.name)+'</b><br>الصف: <b>'+esc(S.cls)+'</b><br>المجموع: <b>'+p+' / 2</b> '+'⭐'.repeat(p)+'<br>إجابات صحيحة: <b>'+S.right+'</b> — خاطئة: <b>'+S.wrong+'</b><br><div id="save-status" style="margin-top:12px;font-weight:700">جارٍ حفظ نتيجتك...</div>';
+  const status=$('save-status');
+  try{
+    const result=await saveStudentResult();
+    if(result&&result.saved===true){S.resultSaved=true;status.textContent='تم حفظ مشاركتك بنجاح ✓';status.style.color='var(--good)'}
+    else if(result&&result.duplicate===true){status.textContent='هذه المشاركة مسجلة مسبقًا، ولا يمكن تسجيل محاولة أخرى.';status.style.color='var(--bad)'}
+    else{throw new Error('لم يتم تأكيد حفظ النتيجة')}
+  }catch(e){
+    status.textContent='تعذر حفظ النتيجة. يرجى إبلاغ المشرف.';
+    status.style.color='var(--bad)';
+    console.error('Supabase result save:',e);
+  }
 }
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 $('hint').onclick=()=>{
