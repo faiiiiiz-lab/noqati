@@ -65,6 +65,58 @@ svg{width:100%;height:100%;overflow:visible}
 @keyframes pp{50%{transform:scale(1.08)}}
 .big{font-size:64px;text-align:center;animation:bn .9s ease-in-out infinite alternate}@keyframes bn{to{transform:translateY(-10px) scale(1.1)}}
 .card.res{display:block;text-align:center;font-size:19px;line-height:1.75;padding:14px}.res b{color:var(--accent)}
+
+/* نافذة حالة المسابقة: ثابتة وواضحة عند إغلاق المسابقة */
+#competition-overlay{
+  position:fixed;inset:0;z-index:10000;
+  display:flex;align-items:center;justify-content:center;
+  padding:22px;
+  background:rgba(16,28,22,.12);
+  /* لا نستخدم blur هنا حتى تبقى صفحة تسجيل الطالب واضحة */
+}
+#competition-overlay[hidden]{display:none!important}
+#competition-overlay .competition-dialog{
+  position:relative;
+  isolation:isolate;
+  width:min(100%,420px);
+  padding:clamp(24px,5vw,34px) 22px;
+  border:5px solid rgba(255,255,255,.96);
+  outline:2px solid rgba(190,157,91,.82);
+  outline-offset:4px;
+  border-radius:26px;
+  /* أبيض حليبي شفاف: يظهر ما داخل النافذة دون تعمية الخلفية */
+  background:rgba(255,255,255,.76);
+  color:#173d30;
+  text-align:center;
+  box-shadow:
+    0 12px 34px rgba(20,45,32,.16),
+    inset 0 1px 0 rgba(255,255,255,.98),
+    inset 0 0 18px rgba(255,255,255,.42);
+}
+#competition-overlay .competition-symbol{
+  width:64px;height:64px;margin:0 auto 14px;
+  display:grid;place-items:center;border-radius:50%;
+  background:rgba(255,255,255,.58);
+  border:2px solid rgba(255,255,255,.96);
+  box-shadow:inset 0 1px 8px rgba(255,255,255,.65),0 4px 14px rgba(20,45,32,.08);
+  font-size:34px;
+}
+#competition-overlay h2{
+  margin:0 0 10px;font-size:clamp(23px,6vw,30px);
+  line-height:1.45;font-weight:900;color:#174a38;
+  text-shadow:0 1px 1px rgba(255,255,255,.72);
+}
+#competition-overlay p{
+  margin:0;font-size:clamp(16px,4.2vw,19px);
+  line-height:1.7;font-weight:750;color:#203f34;
+  text-shadow:0 1px 1px rgba(255,255,255,.65);
+}
+#competition-overlay .retry{
+  margin-top:18px;width:100%;padding:12px 18px;
+  border:0;border-radius:14px;background:#8a5b2c;color:#fff;
+  font:inherit;font-size:17px;font-weight:800;cursor:pointer;
+}
+
 .toast{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%) translateY(-8px);background:var(--ink);color:var(--bg);padding:9px 18px;border-radius:999px;font-weight:800;opacity:0;transition:.25s;pointer-events:none;z-index:9;white-space:nowrap;box-shadow:0 6px 18px #0003}
 .toast.on{opacity:1;transform:translateX(-50%)}
 
@@ -174,6 +226,17 @@ svg{width:100%;height:100%;overflow:visible}
   <div class="tm"><i id="tb"></i></div>
   <p class="q" id="qt">ما القيمة التي تدل عليها هذه المعلومة؟</p><p class="clue" id="clue"></p><div class="opts" id="opts"></div>
 </div>
+
+<div id="competition-overlay" role="alertdialog" aria-modal="true"
+     aria-labelledby="competition-overlay-title" aria-describedby="competition-overlay-message">
+  <div class="competition-dialog">
+    <div class="competition-symbol" aria-hidden="true">🔒</div>
+    <h2 id="competition-overlay-title">جارٍ التحقق من المسابقة</h2>
+    <p id="competition-overlay-message">لحظات من فضلك...</p>
+    <button class="retry" id="competition-retry" type="button" hidden>إعادة المحاولة</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -428,6 +491,43 @@ async function canStudentPlay(name){
 async function isCompetitionOpen(){
   return await supabaseRpc('sahm_is_competition_open',{});
 }
+function setCompetitionOverlay(mode){
+  const overlay=$('competition-overlay');
+  const title=$('competition-overlay-title');
+  const message=$('competition-overlay-message');
+  const retry=$('competition-retry');
+  overlay.hidden=false;
+  if(mode==='closed'){
+    title.textContent='عفوًا، المسابقة مغلقة حاليًا';
+    message.textContent='نعتذر منك، المشاركة غير متاحة الآن. يرجى العودة لاحقًا.';
+    retry.hidden=true;
+  }else if(mode==='error'){
+    title.textContent='تعذر التحقق من حالة المسابقة';
+    message.textContent='تأكد من اتصال الإنترنت ثم أعد المحاولة.';
+    retry.hidden=false;
+  }else{
+    title.textContent='جارٍ التحقق من المسابقة';
+    message.textContent='لحظات من فضلك...';
+    retry.hidden=true;
+  }
+}
+async function checkCompetitionAtPageOpen(){
+  const overlay=$('competition-overlay');
+  setCompetitionOverlay('checking');
+  try{
+    const isOpen=await isCompetitionOpen();
+    if(isOpen===true){
+      overlay.hidden=true;
+    }else{
+      setCompetitionOverlay('closed');
+    }
+  }catch(error){
+    console.error('Initial competition status check:',error);
+    setCompetitionOverlay('error');
+  }
+}
+$('competition-retry').onclick=checkCompetitionAtPageOpen;
+
 async function saveStudentResult(){
   return await supabaseRpc('submit_sahm_result',{
     p_competition_id:COMPETITION_ID,
@@ -480,7 +580,7 @@ async function start(){
     const isOpen=await isCompetitionOpen();
     if(isOpen!==true){
       show('s-start');
-      toast('عفوًا، المسابقة مغلقة حاليًا.');
+      setCompetitionOverlay('closed');
       return;
     }
 
@@ -661,6 +761,9 @@ $('next').onclick=()=>{S.level=2;snd('tap');newLevel()};
 
 $('nm').addEventListener('input',()=>{participationAllowed=false});
 $('cl').addEventListener('change',()=>{participationAllowed=false});
+
+// فحص حالة المسابقة تلقائيًا فور فتح رابط الطلاب
+checkCompetitionAtPageOpen();
 </script>
 </body>
 </html>
