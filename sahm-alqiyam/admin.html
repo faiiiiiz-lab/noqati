@@ -1,148 +1,141 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>لوحة إدارة سهم القيم</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة التحكم | سهم القيم</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--green:#147a4b;--dark:#173b2d;--bg:#f3f6f4;--line:#dce5df;--red:#b42318}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#17231c;font-family:Tahoma,Arial,sans-serif}
-header{background:linear-gradient(120deg,#123d2c,#198454);color:#fff;padding:25px 18px}
-header h1{margin:0 0 8px;font-size:25px}header p{margin:0;opacity:.9}
-main{max-width:900px;margin:22px auto;padding:0 14px}
-.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 4px 18px #173b2d0b}
-h2{font-size:19px;margin:0 0 14px;color:var(--dark)}
-label{display:block;font-weight:bold;margin:12px 0 7px}
-input,textarea{width:100%;padding:12px;border:1px solid #cbd8cf;border-radius:10px;font:inherit;background:#fff}
-textarea{min-height:190px;direction:ltr;text-align:left;font-family:monospace;line-height:1.5}
-button{border:0;border-radius:10px;padding:12px 17px;font:inherit;font-weight:bold;cursor:pointer;margin:6px 4px 0 0}
-.primary{background:var(--green);color:white}.secondary{background:#e8f1eb;color:#174b32}.danger{background:#fff0ef;color:var(--red);border:1px solid #f2c6c2}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row button{flex:1;min-width:135px}
-.muted{color:#66756b;font-size:13px;line-height:1.7}.status{padding:12px;border-radius:10px;background:#edf6ef;margin:10px 0;white-space:pre-wrap}
-.error{background:#fff0ef;color:#8f1d15}.hidden{display:none!important}
-.pill{display:inline-block;padding:5px 10px;border-radius:20px;background:#e9f4ed;color:#17613b;font-size:13px}
-@media(max-width:600px){header h1{font-size:21px}.card{padding:14px}.row{display:grid;grid-template-columns:1fr 1fr}.row button{width:100%;margin:0}}
-</style>
-</head>
-<body>
-<header><h1>لوحة إدارة سهم القيم</h1><p>إدارة المسابقة والمستويين ونتائج الدورات</p></header>
+:root{--g:#146b47;--bg:#f3f7f4;--line:#dfe9e2;--ink:#19372a}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,Arial}header{background:linear-gradient(120deg,#103d2b,#198653);color:white;padding:25px max(18px,calc((100% - 1100px)/2))}header h1{margin:0 0 7px}main{max-width:1100px;margin:22px auto;padding:0 14px}.card,.stat{background:white;border:1px solid var(--line);border-radius:15px;padding:17px;margin-bottom:15px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat span{font-size:13px;color:#718078}.stat strong{display:block;font-size:25px;margin-top:8px}.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1}button{border:0;border-radius:9px;padding:11px 15px;font-weight:bold;cursor:pointer;background:var(--g);color:white}button.alt{background:#e9f3ec;color:#18583b}button.red{background:#fff0ef;color:#a32119}input,select,textarea{width:100%;padding:11px;border:1px solid #cbd9cf;border-radius:9px;font:inherit;margin:5px 0 12px}textarea{min-height:220px;direction:ltr;text-align:left;font:13px/1.6 monospace}label{font-weight:bold;font-size:13px}.muted{color:#718078;font-size:13px;line-height:1.8}.notice{background:#f1f6f2;padding:11px;border-radius:9px;font-size:13px;white-space:pre-wrap;margin-top:10px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:600px}th,td{text-align:right;padding:11px;border-bottom:1px solid var(--line);font-size:13px}th{background:#f2f7f3}.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{background:#e9f3ec;color:#18583b}.tabs button.active{background:var(--g);color:white}@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}header h1{font-size:22px}}
+</style></head>
+<body><header><h1>لوحة التحكم — سهم القيم</h1><div>إدارة المسابقة والمستويات ومتابعة نتائج الطلاب</div></header>
 <main>
-
-<section class="card" id="pinCard">
-<h2>الدخول إلى لوحة الإدارة</h2>
-<p class="muted">أدخل الرقم السري للمتابعة.</p>
-<label for="adminPin">الرقم السري</label>
-<input id="adminPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off">
-<button class="primary" id="pinBtn">دخول</button>
-<div id="pinMsg" class="status hidden"></div>
+<div class="row"><div class="notice" id="connection">جارٍ الاتصال بقاعدة البيانات…</div><button class="alt" id="refresh">تحديث البيانات</button></div>
+<div class="grid">
+<div class="stat"><span>إجمالي المشاركات</span><strong id="total">—</strong></div>
+<div class="stat"><span>مجموع النقاط</span><strong id="points">—</strong></div>
+<div class="stat"><span>عدد الطلاب</span><strong id="students">—</strong></div>
+<div class="stat"><span>حالة المسابقة</span><strong id="state">—</strong></div></div>
+<section class="card"><h2>التحكم بالمسابقة</h2><p class="muted">فتح المسابقة أو إغلاقها من إعدادات Supabase.</p><div class="row"><button id="open">فتح المسابقة</button><button class="red" id="close">إغلاق المسابقة</button></div><div class="notice" id="statusMsg">حالة تنفيذ الأوامر ستظهر هنا.</div></section>
+<section class="card"><h2>نتائج الطلاب والترتيب</h2>
+<label>تصفية حسب الصف</label><select id="classFilter"><option value="">كل الصفوف</option></select>
+<label>بحث باسم الطالب</label><input id="search" placeholder="اكتب اسم الطالب">
+<button class="alt" id="export">تصدير CSV</button><div class="tablewrap"><table><thead><tr><th>الترتيب</th><th>اسم الطالب</th><th>الصف</th><th>النقاط</th><th>الصحيحة</th><th>وقت المشاركة</th></tr></thead><tbody id="results"><tr><td colspan="6">جارٍ التحميل…</td></tr></tbody></table></div><p class="muted" id="resultNote"></p></section>
+<section class="card">
+<h2>تصفير وإعادة المسابقة</h2>
+<p class="muted">ينشئ هذا الإجراء دورة جديدة ويحفظ الدورة السابقة في الأرشيف حسب وظيفة Supabase الحالية. لا تضغط عليه قبل التأكد من أن صفحة الطلاب تستخدم معرّف الدورة الحالية؛ لأن صفحة الطلاب الحالية قد تكون مرتبطة بمعرّف ثابت.</p>
+<label>عنوان المسابقة الجديدة</label>
+<input id="newTitle" value="مسابقة سهم القيم">
+<button class="red" id="resetCompetition">تصفير وإعادة المسابقة</button>
+<div class="notice" id="resetMsg">سيظهر هنا تأكيد العملية أو سبب تعذرها.</div>
 </section>
 
-<section class="card hidden" id="loginCard">
-<h2>دخول المدير</h2>
-<p class="muted">سجّل الدخول بالبريد المسجل في Supabase Auth. لا تستخدم كلمة مرور قاعدة البيانات.</p>
-<label>البريد الإلكتروني</label><input id="email" type="email" value="faiiiiiz@gmail.com" autocomplete="username">
-<label>كلمة المرور</label><input id="password" type="password" autocomplete="current-password">
-<button class="primary" id="loginBtn">تسجيل الدخول</button>
-<div id="loginMsg" class="status hidden"></div>
-</section>
 
-<section id="dashboard" class="hidden">
-<div class="card">
-<div class="row" style="justify-content:space-between"><h2>حالة المسابقة</h2><span class="pill" id="competitionLabel">جارٍ التحميل</span></div>
-<div class="status" id="statusMsg">يتم تحميل إعدادات المسابقة…</div>
+<section class="card" id="questionFetchCard">
+<h2>جلب أسئلة حسب الموضوع</h2>
+<p class="muted">اكتب موضوع المستوى وحدد عدد الأسئلة ومستواها، ثم اطلب إعداد أسئلة جديدة مع مصادرها لمراجعتها قبل الحفظ.</p>
+<label for="fetchTopic">موضوع البحث</label>
+<input id="fetchTopic" placeholder="مثال: التعاون، الأمانة، احترام الآخرين">
 <div class="row">
-<button class="primary" id="openBtn">فتح المسابقة</button>
-<button class="danger" id="closeBtn">إقفال المسابقة</button>
-<button class="secondary" id="refreshBtn">تحديث البيانات</button>
-<button class="secondary" id="logoutBtn">تسجيل الخروج</button>
+<div><label for="fetchCount">عدد الأسئلة</label><select id="fetchCount"><option>5</option><option selected>10</option><option>15</option><option>20</option></select></div>
+<div><label for="fetchDifficulty">مستوى الصعوبة</label><select id="fetchDifficulty"><option value="متوسط">متوسط</option><option value="سهل">سهل</option><option value="صعب">صعب</option><option value="متنوع">متنوع</option></select></div>
 </div>
-</div>
-
-<div class="card">
-<h2>تعديل مواضيع وأسئلة المستويات</h2>
-<p class="muted">اكتب الأسئلة بصيغة JSON صحيحة. احتفظ ببنية الأسئلة التي تعتمدها اللعبة؛ هذه اللوحة تحفظ البيانات في قاعدة البيانات ولا تغيّر واجهة اللعبة تلقائيًا ما لم تكن اللعبة مبرمجة لقراءة إعدادات المستويات من Supabase.</p>
-<label>المستوى</label>
-<select id="levelNo" style="width:100%;padding:12px;border:1px solid #cbd8cf;border-radius:10px;font:inherit">
-<option value="1">المستوى الأول</option><option value="2">المستوى الثاني</option>
-</select>
-<label>موضوع المستوى</label><input id="topic" placeholder="اكتب موضوع المستوى">
-<label>الأسئلة والخيارات والإجابات (JSON)</label>
-<textarea id="questions" spellcheck="false">[]</textarea>
-<div class="row"><button class="primary" id="saveLevelBtn">حفظ المستوى</button><button class="secondary" id="loadLevelBtn">تحميل المستوى</button></div>
-</div>
-
-<div class="card">
-<h2>تصفير المسابقة / بدء دورة جديدة</h2>
-<p class="muted">التصفير ينشئ دورة جديدة ويحتفظ بنتائج الدورة السابقة في الأرشيف، ولا يحذف سجل النتائج القديم.</p>
-<label>عنوان الدورة الجديدة</label><input id="newTitle" value="مسابقة سهم القيم">
-<button class="danger" id="resetBtn">إنشاء دورة جديدة</button>
-</div>
+<button id="fetchQuestions">جلب أسئلة حسب الموضوع</button>
+<div class="notice" id="fetchMsg">ستظهر الأسئلة المقترحة هنا لمراجعتها قبل إضافتها إلى المستوى.</div>
+<div id="fetchedQuestions" style="margin-top:12px"></div>
+<button class="alt" id="appendFetched" style="display:none">إضافة الأسئلة إلى محرر المستوى</button>
 </section>
+<section class="card"><h2>إدارة المستويات والأسئلة</h2><div class="tabs"><button class="active" data-level="1">المستوى الأول</button><button data-level="2">المستوى الثاني</button></div>
+<label>موضوع المستوى</label><input id="topic" placeholder="اكتب موضوع المستوى">
+<label>الأسئلة بصيغة JSON</label><textarea id="questions" spellcheck="false">[]</textarea>
+<p class="muted">يُحفظ محتوى الأسئلة في جدول المستويات. ظهور الأسئلة الجديدة في لعبة الطلاب يتطلب أن تكون صفحة اللعبة مهيأة لقراءة هذا الجدول؛ لن نغيّر صفحة الطلاب في هذه الخطوة.</p>
+<div class="row"><button id="save">حفظ المستوى</button><button class="alt" id="load">إعادة تحميل</button></div><div class="notice" id="levelMsg"></div></section>
 </main>
 <script>
-(() => {
- const SUPABASE_URL = 'https://apfyqlshgnocvbinosmb.supabase.co';
- const SUPABASE_KEY = 'sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38';
- const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+(()=>{'use strict';
+const db=window.supabase.createClient('https://apfyqlshgnocvbinosmb.supabase.co','sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38');
+const $=id=>document.getElementById(id), FALLBACK='sahm-alqiyam-2026';let cfg={},data=[],level=1;
+const say=(id,s)=>$(id).textContent=s;
+async function rpc(n,a={}){let r=await db.rpc(n,a);if(r.error)throw r.error;return r.data}
+function compId(){return cfg?.competition?.id||cfg?.current_competition?.id||FALLBACK}
+async function loadConfig(){cfg=await rpc('sahm_admin_get_config');let c=cfg?.competition||cfg?.current_competition||cfg;say('state',c?.is_open===true?'مفتوحة':c?.is_open===false?'مغلقة':'غير محددة');let l=(cfg.levels||[]).find(x=>+x.level_no===level);if(l){$('topic').value=l.topic||'';$('questions').value=JSON.stringify(l.questions||[],null,2)}}
+async function loadResults(){let r=await db.from('sahm_alqiyam_results').select('student_name,class_name,points,correct_answers,submitted_at,competition_id').eq('competition_id',compId()).order('points',{ascending:false}).order('submitted_at',{ascending:true}).limit(2000);if(r.error)throw r.error;data=r.data||[];$('total').textContent=data.length;$('points').textContent=data.reduce((s,x)=>s+(+x.points||0),0);$('students').textContent=new Set(data.map(x=>x.student_name)).size;let cs=[...new Set(data.map(x=>x.class_name).filter(Boolean))].sort();let old=$('classFilter').value;$('classFilter').innerHTML='<option value="">كل الصفوف</option>'+cs.map(c=>'<option>'+esc(c)+'</option>').join('');$('classFilter').value=cs.includes(old)?old:'';render()}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){let c=$('classFilter').value,q=$('search').value.trim().toLowerCase(),a=data.filter(x=>(!c||x.class_name===c)&&(!q||(x.student_name||'').toLowerCase().includes(q)));$('results').innerHTML=a.length?a.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.student_name)}</td><td>${esc(x.class_name)}</td><td>${+x.points||0}</td><td>${+x.correct_answers||0}</td><td>${x.submitted_at?new Date(x.submitted_at).toLocaleString('ar-SA'):'—'}</td></tr>`).join(''):'<tr><td colspan="6">لا توجد نتائج.</td></tr>';$('resultNote').textContent=`عرض ${a.length} من أصل ${data.length} مشاركة.`}
+async function refresh(){try{say('connection','متصل');await loadConfig();await loadResults()}catch(e){say('connection','تعذر الاتصال: '+e.message)}}
+$('refresh').onclick=refresh;$('open').onclick=async()=>{try{await rpc('sahm_admin_set_status',{p_open:true});await refresh();say('statusMsg','تم إرسال طلب فتح المسابقة.')}catch(e){say('statusMsg','تعذر الفتح: '+e.message)}};
+$('close').onclick=async()=>{if(!confirm('تأكيد إغلاق المسابقة؟'))return;try{await rpc('sahm_admin_set_status',{p_open:false});await refresh();say('statusMsg','تم إرسال طلب الإغلاق.')}catch(e){say('statusMsg','تعذر الإغلاق: '+e.message)}};
+document.querySelectorAll('[data-level]').forEach(b=>b.onclick=async()=>{level=+b.dataset.level;document.querySelectorAll('[data-level]').forEach(x=>x.classList.toggle('active',x===b));try{await loadConfig();say('levelMsg','تم تحميل المستوى '+level)}catch(e){say('levelMsg',e.message)}});
+$('load').onclick=async()=>{try{await loadConfig();say('levelMsg','تمت إعادة التحميل.')}catch(e){say('levelMsg',e.message)}};
+$('save').onclick=async()=>{try{let q=JSON.parse($('questions').value);if(!Array.isArray(q))throw Error('يجب أن تكون الأسئلة مصفوفة JSON');await rpc('sahm_admin_save_level',{p_level_no:level,p_topic:$('topic').value.trim(),p_questions:q});say('levelMsg','تم حفظ المستوى '+level)}catch(e){say('levelMsg','لم يتم الحفظ: '+e.message)}};
+$('resetCompetition').onclick=async()=>{
+  const title=$('newTitle').value.trim()||'مسابقة سهم القيم';
+  const warning='تنبيه: إنشاء دورة جديدة قد يفصل لوحة التحكم عن صفحة الطلاب إذا كانت صفحة الطلاب تستخدم معرّف المسابقة القديم. هل تأكدت من ربط صفحة الطلاب بالمعرّف الحالي؟';
+  if(!confirm(warning))return;
+  if(!confirm('تأكيد نهائي: سيتم إنشاء دورة جديدة مع الاحتفاظ بالدورة السابقة في الأرشيف. هل تريد المتابعة؟'))return;
+  try{
+    await rpc('sahm_admin_reset_competition',{p_new_title:title});
+    await refresh();
+    say('resetMsg','تم إرسال طلب إنشاء دورة جديدة. تحقق من إعدادات المسابقة ومعرّفها قبل استقبال مشاركات الطلاب.');
+  }catch(e){
+    say('resetMsg','تعذر تصفير وإعادة المسابقة: '+e.message);
+  }
+};
 
- const PIN_CODE = '2626';
- const pinCard = $('pinCard');
- $('pinBtn').onclick = () => {
-   if ($('adminPin').value === PIN_CODE) {
-     pinCard.classList.add('hidden');
-     $('loginCard').classList.remove('hidden');
-     $('adminPin').value = '';
-   } else {
-     message('pinMsg','الرقم السري غير صحيح.',true);
-     $('adminPin').value = '';
-   }
- };
- $('adminPin').addEventListener('keydown', e => { if(e.key === 'Enter') $('pinBtn').click(); });
+$('classFilter').onchange=render;$('search').oninput=render;
+$('export').onclick=()=>{let a=[['اسم الطالب','الصف','النقاط','الصحيحة','وقت المشاركة'],...data.map(x=>[x.student_name,x.class_name,x.points,x.correct_answers,x.submitted_at])];let csv='\ufeff'+a.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');let u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),l=document.createElement('a');l.href=u;l.download='نتائج-سهم-القيم.csv';l.click();URL.revokeObjectURL(u)};
 
- const $ = id => document.getElementById(id);
- function message(id, text, error=false){const el=$(id);el.textContent=text;el.classList.remove('hidden','error');if(error)el.classList.add('error')}
- function showDashboard(){ $('loginCard').classList.add('hidden'); $('dashboard').classList.remove('hidden'); }
- function showLogin(){ $('dashboard').classList.add('hidden'); $('loginCard').classList.remove('hidden'); }
- async function rpc(name,args={}){const {data,error}=await db.rpc(name,args);if(error)throw error;return data}
- async function refresh(){
-   try{
-     const cfg=await rpc('sahm_admin_get_config');
-     $('statusMsg').textContent=JSON.stringify(cfg,null,2);
-     const comp=cfg?.competition || cfg?.current_competition || cfg;
-     $('competitionLabel').textContent=(comp?.title || 'المسابقة الحالية')+' — '+(comp?.is_open===true?'مفتوحة':comp?.is_open===false?'مغلقة':'الحالة غير محددة');
-     const levels=cfg?.levels;
-     if(Array.isArray(levels)){const l=levels.find(x=>Number(x.level_no)===Number($('levelNo').value));if(l){$('topic').value=l.topic||'';$('questions').value=JSON.stringify(l.questions??[],null,2)}}
-   }catch(e){message('statusMsg','تعذر تحميل الإعدادات: '+(e.message||e),true)}
- }
- $('loginBtn').onclick=async()=>{
-   message('loginMsg','جارٍ تسجيل الدخول…');
-   const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
-   if(error){message('loginMsg',error.message,true);return}
-   showDashboard();await refresh();
- };
- $('logoutBtn').onclick=async()=>{await db.auth.signOut();showLogin()};
- $('refreshBtn').onclick=refresh;
- $('openBtn').onclick=async()=>{try{await rpc('sahm_admin_set_status',{p_open:true});await refresh();message('statusMsg','تم إرسال أمر فتح المسابقة.\\n'+$('statusMsg').textContent)}catch(e){message('statusMsg','تعذر فتح المسابقة: '+e.message,true)}};
- $('closeBtn').onclick=async()=>{try{await rpc('sahm_admin_set_status',{p_open:false});await refresh();message('statusMsg','تم إرسال أمر إقفال المسابقة.\\n'+$('statusMsg').textContent)}catch(e){message('statusMsg','تعذر إقفال المسابقة: '+e.message,true)}};
- $('loadLevelBtn').onclick=refresh;
- $('saveLevelBtn').onclick=async()=>{
-   try{const questions=JSON.parse($('questions').value);await rpc('sahm_admin_save_level',{p_level_no:Number($('levelNo').value),p_topic:$('topic').value.trim(),p_questions:questions});message('statusMsg','تم حفظ إعدادات المستوى.');}
-   catch(e){message('statusMsg','تعذر الحفظ. تحقق من صيغة JSON وصلاحيات المدير: '+e.message,true)}
- };
- $('resetBtn').onclick=async()=>{
-   if(!confirm('هل تريد إنشاء دورة جديدة؟ ستبقى نتائج الدورة الحالية محفوظة في الأرشيف.'))return;
-   try{await rpc('sahm_admin_reset_competition',{p_new_title:$('newTitle').value.trim()||'مسابقة سهم القيم'});await refresh();message('statusMsg','تم إرسال طلب إنشاء دورة جديدة. تأكد من تحديث إعدادات اللعبة لتستخدم معرّف الدورة الجديدة.\\n'+$('statusMsg').textContent)}
-   catch(e){message('statusMsg','تعذر إنشاء الدورة: '+e.message,true)}
- };
- $('levelNo').onchange=refresh;
- db.auth.getSession().then(async({data})=>{
-   if(data.session){
-     pinCard.classList.add('hidden');
-     showDashboard();
-     await refresh();
-   }
- });
+let fetchedQuestions=[];
+$('fetchQuestions').onclick=async()=>{
+ const topic=$('fetchTopic').value.trim()||$('topic').value.trim();
+ if(!topic){say('fetchMsg','اكتب موضوعًا أولًا.');return;}
+ $('fetchQuestions').disabled=true;
+ say('fetchMsg','جارٍ البحث وإعداد الأسئلة…');
+ $('fetchedQuestions').innerHTML='';
+ $('appendFetched').style.display='none';
+ try{
+   const {data,error}=await db.functions.invoke('generate-sahm-questions',{
+     body:{
+       topic,
+       count:Number($('fetchCount').value),
+       difficulty:$('fetchDifficulty').value,
+       level:level
+     }
+   });
+   if(error)throw error;
+   fetchedQuestions=data?.questions||[];
+   if(!fetchedQuestions.length)throw Error('لم تصل أسئلة من خدمة التوليد.');
+   $('fetchedQuestions').innerHTML=fetchedQuestions.map((q,i)=>`
+    <div class="notice" style="margin-bottom:9px">
+      <b>${i+1}. ${esc(q.question||'')}</b>
+      <ol>${(q.options||[]).map(o=>`<li>${esc(o.label||o)}</li>`).join('')}</ol>
+      <div>الإجابة: ${esc(q.correctAnswer||q.answer||'غير محددة')}</div>
+      <div>المصدر: <a href="${esc(q.sourceUrl||'#')}" target="_blank" rel="noopener">${esc(q.sourceTitle||q.sourceUrl||'غير مرفق')}</a></div>
+      <div>${esc(q.explanation||'')}</div>
+    </div>`).join('');
+   $('appendFetched').style.display='inline-block';
+   say('fetchMsg',`تم إعداد ${fetchedQuestions.length} أسئلة. راجعها ومصادرها قبل إضافتها.`);
+ }catch(e){
+   say('fetchMsg','تعذر جلب الأسئلة: '+(e.message||e)+'\\nتأكد من نشر خدمة generate-sahm-questions وإضافة مفاتيح مزود البحث والتوليد في Supabase Secrets.');
+ }finally{$('fetchQuestions').disabled=false;}
+};
+$('appendFetched').onclick=()=>{
+ try{
+   let existing=JSON.parse($('questions').value||'[]');
+   if(!Array.isArray(existing))throw Error('محرر الأسئلة ليس مصفوفة JSON.');
+   const converted=fetchedQuestions.map((q,i)=>({
+     id:q.id||('web_'+Date.now()+'_'+i),
+     question:q.question,
+     options:q.options,
+     correctAnswer:q.correctAnswer||q.answer,
+     explanation:q.explanation||'',
+     sourceTitle:q.sourceTitle||'',
+     sourceUrl:q.sourceUrl||''
+   }));
+   $('questions').value=JSON.stringify([...existing,...converted],null,2);
+   say('levelMsg','أضيفت الأسئلة إلى المحرر. راجع توافق بنيتها مع لعبة الطلاب ثم اضغط حفظ المستوى.');
+ }catch(e){say('fetchMsg','تعذر الإضافة: '+e.message);}
+};
+
+refresh();
 })();
-</script>
-</body></html>
+</script></body></html>
