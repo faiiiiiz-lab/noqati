@@ -28,7 +28,17 @@ button{border:0;border-radius:10px;padding:12px 17px;font:inherit;font-weight:bo
 <body>
 <header><h1>لوحة إدارة سهم القيم</h1><p>إدارة المسابقة والمستويين ونتائج الدورات</p></header>
 <main>
-<section class="card" id="loginCard">
+
+<section class="card" id="pinCard">
+<h2>الدخول إلى لوحة الإدارة</h2>
+<p class="muted">أدخل الرقم السري للمتابعة.</p>
+<label for="adminPin">الرقم السري</label>
+<input id="adminPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off">
+<button class="primary" id="pinBtn">دخول</button>
+<div id="pinMsg" class="status hidden"></div>
+</section>
+
+<section class="card hidden" id="loginCard">
 <h2>دخول المدير</h2>
 <p class="muted">سجّل الدخول بالبريد المسجل في Supabase Auth. لا تستخدم كلمة مرور قاعدة البيانات.</p>
 <label>البريد الإلكتروني</label><input id="email" type="email" value="faiiiiiz@gmail.com" autocomplete="username">
@@ -75,6 +85,21 @@ button{border:0;border-radius:10px;padding:12px 17px;font:inherit;font-weight:bo
  const SUPABASE_URL = 'https://apfyqlshgnocvbinosmb.supabase.co';
  const SUPABASE_KEY = 'sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38';
  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+ const PIN_CODE = '2626';
+ const pinCard = $('pinCard');
+ $('pinBtn').onclick = () => {
+   if ($('adminPin').value === PIN_CODE) {
+     pinCard.classList.add('hidden');
+     $('loginCard').classList.remove('hidden');
+     $('adminPin').value = '';
+   } else {
+     message('pinMsg','الرقم السري غير صحيح.',true);
+     $('adminPin').value = '';
+   }
+ };
+ $('adminPin').addEventListener('keydown', e => { if(e.key === 'Enter') $('pinBtn').click(); });
+
  const $ = id => document.getElementById(id);
  function message(id, text, error=false){const el=$(id);el.textContent=text;el.classList.remove('hidden','error');if(error)el.classList.add('error')}
  function showDashboard(){ $('loginCard').classList.add('hidden'); $('dashboard').classList.remove('hidden'); }
@@ -111,7 +136,13 @@ button{border:0;border-radius:10px;padding:12px 17px;font:inherit;font-weight:bo
    catch(e){message('statusMsg','تعذر إنشاء الدورة: '+e.message,true)}
  };
  $('levelNo').onchange=refresh;
- db.auth.getSession().then(async({data})=>{if(data.session){showDashboard();await refresh()}});
+ db.auth.getSession().then(async({data})=>{
+   if(data.session){
+     pinCard.classList.add('hidden');
+     showDashboard();
+     await refresh();
+   }
+ });
 })();
 </script>
 </body></html>
