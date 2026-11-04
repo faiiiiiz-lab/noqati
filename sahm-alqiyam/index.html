@@ -6,7 +6,7 @@
 <title>سهم القيم</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f7ecdc;--ink:#6e4b2f;--accent:#c07a2b;--card:#fffaf1;--line:#e3d4bb;--drop:#4aa8f0;--off:#cfc5b4;--bad:#d6403a;--good:#3fa25a;--hint:#7a4fc0;--dot:#d8c8ad;
+:root{--bg:#fbf7ef;--ink:#594632;--accent:#b98245;--card:rgba(255,253,248,.94);--line:#e9dfd0;--drop:#4aa8f0;--off:#cfc5b4;--bad:#d6403a;--good:#3fa25a;--hint:#7a4fc0;--dot:#d8c8ad;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1f1a15;--ink:#dcc09a;--accent:#e0a35a;--card:#2b241c;--line:#3d3329;--off:#4a4034;--dot:#4a3f31}}
 :root[data-theme="dark"]{--bg:#1f1a15;--ink:#dcc09a;--accent:#e0a35a;--card:#2b241c;--line:#3d3329;--off:#4a4034;--dot:#4a3f31}
@@ -22,13 +22,19 @@ h1{margin:6px 0 0;font-size:30px;font-weight:800;color:var(--accent);text-align:
 .bgs .sub{color:#fff;opacity:1;text-shadow:0 2px 8px rgba(0,0,0,.6);font-weight:700}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
 #s-start{justify-content:center}
-#s-start .card{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(255,250,241,.9);color:#4a3320}
-#s-start .card input,#s-start .card select{background:#fff;color:#4a3320;border-color:#e2d3bb}
+#s-start .card{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(255,252,246,.94);color:#514330}
+#s-start .card input,#s-start .card select{background:rgba(255,255,255,.96);color:#514330;border-color:#e8ddcb}
 label{font-weight:700;font-size:15px}
 input,select{font:inherit;font-size:17px;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
 .credit{margin:14px 0 4px;text-align:center;font-size:11.5px;line-height:1.8;letter-spacing:.3px;font-weight:700;color:var(--ink);opacity:.75;padding-top:10px;border-top:1px solid;border-image:linear-gradient(90deg,transparent,#c9a45c,transparent) 1}
 .bgs .credit{color:#fff;opacity:.95;text-shadow:0 1px 6px rgba(0,0,0,.6)}
-#s-help{gap:10px}#s-help h1{font-size:26px;margin:0}.help{gap:9px;padding:12px 14px}.st{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.55}.st b{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:15px}
+#s-help{gap:10px;min-width:0;width:100%;overflow-y:auto;overflow-x:hidden}
+#s-help h1{font-size:26px;margin:0;flex:none}
+#s-help .help{gap:10px;padding:14px 13px;width:100%;max-width:100%;min-width:0;overflow:hidden}
+#s-help .st{display:flex;gap:10px;align-items:flex-start;min-width:0;width:100%;font-size:15px;line-height:1.6}
+#s-help .st b{flex:0 0 26px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:15px}
+#s-help .st span{display:block;flex:1;min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:normal}
+#s-help #ok{flex:none;width:100%;max-width:100%}
 .btn{font:inherit;font-weight:800;font-size:18px;padding:14px;border:0;border-radius:14px;background:var(--accent);color:#fff;cursor:pointer;box-shadow:0 5px 0 #0003}
 .btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0003}
 .top{display:grid;grid-template-columns:44px 1fr 90px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:6px}
@@ -120,41 +126,46 @@ svg{width:100%;height:100%;overflow:visible}
 .toast{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%) translateY(-8px);background:var(--ink);color:var(--bg);padding:9px 18px;border-radius:999px;font-weight:800;opacity:0;transition:.25s;pointer-events:none;z-index:9;white-space:nowrap;box-shadow:0 6px 18px #0003}
 .toast.on{opacity:1;transform:translateX(-50%)}
 
-/* شاشة شرح اللعبة: تستغل مساحة الشاشة كاملة دون تمرير */
+/* شاشة شرح اللعبة: الإبقاء على الخط والحجم الأصليين مع إطالة الإطار قليلًا */
 #s-help{
   gap:clamp(8px,1.8vh,18px);
   justify-content:space-between;
-  padding-block:clamp(8px,1.8vh,18px);
+  padding-block:clamp(8px,1.8vh,18px) 0px;
 }
 #s-help h1{
   flex:none;
-  font-size:clamp(30px,4vh,40px);
+  font-size:26px;
   margin:0;
 }
 #s-help .help{
   flex:1;
   min-height:0;
   justify-content:space-evenly;
-  gap:clamp(10px,2vh,22px);
-  padding:clamp(14px,2.8vh,28px) clamp(14px,3.5vw,24px);
+  gap:10px;
+  padding:14px 13px;
+  overflow-y:auto;
+  overflow-x:hidden;
 }
 #s-help .st{
-  align-items:center;
-  gap:clamp(12px,2.5vw,18px);
-  font-size:clamp(17px,2.35vh,21px);
-  line-height:1.55;
+  align-items:flex-start;
+  gap:10px;
+  font-size:16px;
+  line-height:1.65;
+  font-weight:500;
+  flex:none;
 }
 #s-help .st b{
-  width:clamp(32px,4.5vh,40px);
-  height:clamp(32px,4.5vh,40px);
-  font-size:clamp(17px,2.2vh,20px);
+  flex:0 0 26px;
+  width:26px;
+  height:26px;
+  font-size:15px;
 }
 #s-help #ok{flex:none}
 @media(max-height:650px){
-  #s-help{gap:6px;padding-block:5px}
-  #s-help .help{gap:6px;padding:8px 12px}
-  #s-help .st{font-size:clamp(15px,2.5vh,18px);line-height:1.35}
-  #s-help .st b{width:28px;height:28px;font-size:15px}
+  #s-help{gap:6px;padding-block:5px 0}
+  #s-help .help{gap:6px;padding:8px 12px;overflow-y:auto}
+  #s-help .st{font-size:16px;line-height:1.65;font-weight:500}
+  #s-help .st b{width:26px;height:26px;font-size:15px}
   #s-help #ok{padding:10px;font-size:16px}
 }
 
