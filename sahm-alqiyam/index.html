@@ -82,15 +82,16 @@ svg{width:100%;height:100%;overflow:visible}
 #s-help .help{
   flex:1;
   min-height:0;
-  justify-content:space-evenly;
-  gap:clamp(10px,2vh,22px);
-  padding:clamp(14px,2.8vh,28px) clamp(14px,3.5vw,24px);
+  justify-content:space-around;
+  gap:clamp(5px,1vh,10px);
+  padding:clamp(9px,1.5vh,15px) clamp(12px,3vw,22px);
+  overflow:hidden;
 }
 #s-help .st{
   align-items:center;
-  gap:clamp(12px,2.5vw,18px);
-  font-size:clamp(17px,2.35vh,21px);
-  line-height:1.55;
+  gap:clamp(9px,2vw,16px);
+  font-size:clamp(16px,2.05vh,19px);
+  line-height:1.35;
 }
 #s-help .st b{
   width:clamp(32px,4.5vh,40px);
@@ -98,10 +99,10 @@ svg{width:100%;height:100%;overflow:visible}
   font-size:clamp(17px,2.2vh,20px);
 }
 #s-help #ok{flex:none}
-@media(max-height:650px){
+@media(max-height:760px){
   #s-help{gap:6px;padding-block:5px}
-  #s-help .help{gap:6px;padding:8px 12px}
-  #s-help .st{font-size:clamp(15px,2.5vh,18px);line-height:1.35}
+  #s-help .help{gap:4px;padding:7px 10px}
+  #s-help .st{font-size:clamp(14px,2.15vh,17px);line-height:1.28}
   #s-help .st b{width:28px;height:28px;font-size:15px}
   #s-help #ok{padding:10px;font-size:16px}
 }
@@ -138,6 +139,7 @@ svg{width:100%;height:100%;overflow:visible}
     <div class="st"><b>٥</b><span>فكّك كل الأسهم لتجتاز المستوى وتكسب نقطة ⭐ (المستوى الأول: القيم، والثاني: التنمر).</span></div>
     <div class="st"><b>💡</b><span>عندك تلميحان يدلّانك على سهم يمكنك الضغط عليه.</span></div>
   </div>
+  <p id="help-status" role="status" aria-live="polite" style="min-height:24px;text-align:center;font-weight:700"></p>
   <button class="btn" id="ok">فهمت، ابدأ اللعب</button>
 </section>
 
@@ -265,7 +267,7 @@ let S={},AC=null,muted=false;
 const SUPABASE_URL='https://apfyqlshgnocvbinosmb.supabase.co';
 const SUPABASE_KEY='sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38';
 const COMPETITION_ID='sahm-alqiyam-2026';
-let attemptCheckInProgress=false;
+let attemptCheckInProgress=false, participationAllowed=false;
 const DEVICE_ID_KEY='sahm_alqiyam_device_id_v1';
 function getDeviceId(){
   let id=localStorage.getItem(DEVICE_ID_KEY);
@@ -334,11 +336,11 @@ function depths(arr){
 }
 function genChain(n,lo,hi){
   let best=[];
-  for(let r=0;r<40;r++){
+  for(let r=0;r<14;r++){
     const arr=[],occ=new Set();let U=[],fails=0;
-    while(arr.length<n&&fails<25){
+    while(arr.length<n&&fails<14){
       const dep=depths(arr);let pk=null,ps=-1e9,pb=null;
-      for(let k=0;k<70;k++){
+      for(let k=0;k<38;k++){
         const c=cand(occ,lo,hi);if(!c)continue;
         const blocks=[];arr.forEach((a,i)=>{if(a.ray.some(q=>c.own.has(q)))blocks.push(i)});
         const hit=blocks.filter(i=>U.includes(i));
@@ -441,11 +443,11 @@ function newLevel(){
   const [lo,hi]=LEN[S.level-1],arr=genChain(NS_[S.level-1],lo,hi);
   const pool=S.level===1?S.clues.slice(0,14):S.bully.slice(0,18);
   arr.forEach((a,i)=>{a.q=pool[i];a.gone=false});
-  S.arrows=arr;S.busy=false;S.cur=null;S.lives=3;TIME=TIMES[S.level-1];
+  S.arrows=arr;S.busy=false;S.cur=null;S.lives=3;S.levelTransitioned=false;TIME=TIMES[S.level-1];
   show('s-game');draw();drops();setScore();setCombo();
 }
 function getTripleName(){
-  return $('nm').value.trim().replace(/\\s+/g,' ').split(' ').filter(Boolean);
+  return $('nm').value.trim().replace(/\s+/g,' ').split(' ').filter(Boolean);
 }
 function validStudentDetails(){
   const parts=getTripleName();
@@ -467,13 +469,25 @@ async function start(){
   if(!validStudentDetails())return;
   const btn=$('go');
   attemptCheckInProgress=true;
+  participationAllowed=false;
+  $('ok').disabled=true;
+  $('ok').textContent='جارٍ التحقق من المشاركة...';
+  $('help-status').textContent='يتم التحقق من إمكانية المشاركة، يمكنك قراءة التعليمات الآن.';
+  show('s-help');
   try{
-    if(btn)btn.disabled=true;
     const allowed=await canStudentPlay($('nm').value.trim());
-    if(allowed!==true){toast('سبق لك المشاركة في هذه المسابقة، شكرًا لمشاركتك');return}
-    show('s-help');
+    if(allowed!==true){
+      show('s-start');
+      toast('سبق لك المشاركة في هذه المسابقة، شكرًا لمشاركتك');
+      return;
+    }
+    participationAllowed=true;
+    $('ok').disabled=false;
+    $('ok').textContent='فهمت، ابدأ اللعب';
+    $('help-status').textContent='';
   }catch(e){
-    toast('تعذر التحقق من المشاركة. تأكد من الاتصال بالإنترنت وحاول مجددًا');
+    show('s-start');
+    toast('تعذر التحقق من المشاركة. تأكد من الاتصال وحاول مجددًا');
     console.error('Supabase participation check:',e);
   }finally{
     attemptCheckInProgress=false;
@@ -481,12 +495,20 @@ async function start(){
   }
 }
 function begin(){
+  if(attemptCheckInProgress){toast('انتظر اكتمال التحقق من المشاركة');return;}
+  if(!participationAllowed){toast('تحقق من المشاركة أولًا');return;}
   if(!validStudentDetails())return;
-  S.name=$('nm').value.trim().replace(/\\s+/g,' ');S.cls=$('cl').value;
+  S.name=$('nm').value.trim().replace(/\s+/g,' ');S.cls=$('cl').value;
   try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}
   $('wn').textContent=S.name;$('wc').textContent=S.cls;
   Object.assign(S,{points:0,level:1,hints:2,combo:0,right:0,wrong:0,clues:shuffle(BANK),bully:mixBully(),resultSaved:false,finishStarted:false});
-  $('hc').textContent=2;snd('tap');newLevel();
+  $('hc').textContent=2;snd('tap');
+  const go=$('ok');go.disabled=true;go.textContent='جارٍ تجهيز المستوى الأول...';
+  // Give the browser a frame to respond to the tap before building the board.
+  requestAnimationFrame(()=>setTimeout(()=>{
+    newLevel();
+    go.disabled=false;go.textContent='فهمت، ابدأ اللعب';
+  },30));
 }
 function tapArrow(a){
   if(S.busy||a.gone)return;
@@ -556,12 +578,42 @@ function loseLife(){
   S.lives--;drops();
   try{$('drops').children[S.lives].animate([{transform:'scale(1.8)',opacity:.3},{transform:'scale(1)',opacity:1}],{duration:450})}catch(e){}
   if(S.lives===1)setTimeout(()=>toast('قطرة واحدة فقط! 💧'),900);
-  if(S.lives<=0){S.busy=true;snd('lose');setTimeout(finish,900)}
+  if(S.lives<=0){
+    S.busy=true;snd('lose');
+    setTimeout(()=>levelFailed(),900);
+  }
+}
+function showLevelTransition(passed){
+  if(S.levelTransitioned)return;
+  S.levelTransitioned=true;
+  S.busy=true;
+  if(S.level===1){
+    $('ln').textContent=S.name;
+    const card=document.querySelector('#s-lvl .res');
+    card.innerHTML=passed
+      ? 'اجتزت مستوى القيم<br>وكسبت <b>نقطة</b> ⭐'
+      : 'لم تجتز مستوى القيم هذه المرة<br>لا تقلق، انتقل إلى المستوى الثاني وحاول جمع نقطة ⭐';
+    $('next').textContent='الانتقال إلى المستوى الثاني: التنمر';
+    setTimeout(()=>show('s-lvl'),900);
+  }else{
+    setTimeout(finish,900);
+  }
+}
+function levelFailed(){
+  if(S.levelTransitioned)return;
+  snd('lose');
+  if(S.level===1){
+    toast('انتهت محاولاتك في المستوى الأول، نكمل للمستوى الثاني');
+    showLevelTransition(false);
+  }else{
+    toast('انتهت محاولاتك في المستوى الثاني');
+    showLevelTransition(false);
+  }
 }
 function levelDone(){
+  if(S.levelTransitioned)return;
   S.points++;setScore();S.busy=true;snd('win');toast('المستوى مكتمل 🎉');
-  if(S.level===1){$('ln').textContent=S.name;setTimeout(()=>show('s-lvl'),1300)}
-  else setTimeout(finish,1500);
+  showLevelTransition(true);
 }
 async function finish(){
   if(S.finishStarted)return;
@@ -591,10 +643,12 @@ $('hint').onclick=()=>{
 };
 $('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'🔇':'🔊'};
 $('theme').onclick=()=>{const r=document.documentElement,d=r.getAttribute('data-theme')==='dark';r.setAttribute('data-theme',d?'light':'dark')};
-$('back').onclick=()=>{clearInterval(S.ti);$('sheet').classList.remove('on','hurry');show('s-start')};
+$('back').onclick=()=>{clearInterval(S.ti);$('sheet').classList.remove('on','hurry');participationAllowed=false;show('s-start')};
 $('go').onclick=start;$('ok').onclick=begin;
 $('next').onclick=()=>{S.level=2;snd('tap');newLevel()};
-$('again').onclick=()=>show('s-start');
+$('again').onclick=()=>{participationAllowed=false;show('s-start')};
+$('nm').addEventListener('input',()=>{participationAllowed=false});
+$('cl').addEventListener('change',()=>{participationAllowed=false});
 </script>
 </body>
 </html>
