@@ -139,8 +139,30 @@ body{padding:10px}
 #send.is-saving .send-progress-fill{width:100%!important;background:linear-gradient(90deg,#c9efd8,#a8dfbd);}
 </style>
 
+<style>
+/* نافذة تنبيه داخلية أنيقة بدل نافذة المتصفح */
+.notice-overlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(5,28,21,.30);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.notice-overlay.show{display:flex;animation:noticeFade .2s ease}.notice-overlay.locked{pointer-events:all}
+.notice-card{width:min(100%,430px);position:relative;overflow:hidden;text-align:center;padding:30px 24px 22px;border:1px solid rgba(255,255,255,.88);border-radius:25px;background:linear-gradient(145deg,rgba(255,255,255,.91),rgba(239,249,242,.84));box-shadow:0 22px 65px rgba(4,48,34,.24),inset 0 1px 0 rgba(255,255,255,.95)}
+.notice-card:before{content:"";position:absolute;inset:0 0 auto;height:5px;background:linear-gradient(90deg,#b9dfc5,#0d7959,#e8d49b)}
+.notice-symbol{width:58px;height:58px;margin:0 auto 13px;border-radius:19px;display:grid;place-items:center;background:linear-gradient(145deg,#e4f3e8,#cfe8d7);color:#075b46;font-size:29px;box-shadow:inset 0 1px 0 #fff,0 7px 18px rgba(7,91,70,.10)}
+.notice-card h2{margin:0 0 10px;color:#075b46;font-size:clamp(21px,5.5vw,26px);font-weight:800;line-height:1.5;letter-spacing:-.4px}
+.notice-card p{margin:0;color:#405b50;font-size:16px;line-height:1.9}.notice-card.is-closed{padding-bottom:30px}
+.notice-ok{display:block;width:100%;margin-top:22px;padding:13px 18px;border:0;border-radius:14px;background:linear-gradient(110deg,#0a7655,#07503e);color:#fff;font:700 15px Tahoma,Arial,sans-serif;box-shadow:0 8px 18px rgba(7,91,70,.18);cursor:pointer}
+@keyframes noticeFade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:430px){.notice-card{padding:27px 20px 20px;border-radius:23px}.notice-card p{font-size:15px}}
+</style>
 </head>
-<body><main class="shell">
+<body>
+<div class="notice-overlay" id="noticeOverlay" role="dialog" aria-modal="true" aria-labelledby="noticeTitle">
+  <section class="notice-card">
+    <div class="notice-symbol" aria-hidden="true">✦</div>
+    <h2 id="noticeTitle">المسابقة مغلقة حاليًا</h2>
+    <p id="noticeMessage">نعتذر، لا نستقبل المشاركات في الوقت الحالي.</p>
+    <button class="notice-ok" id="noticeOk" type="button">حسنًا</button>
+  </section>
+</div>
+<main class="shell">
 <header class="header"><div class="kicker">فعالية الويكند</div><h1>صندوق الإبداع</h1><p>أبدع.. وشاركنا شيئاً تفخر به</p><div class="schools"><span>ابتدائية سهل بن عدي الأنصاري</span><i></i><span>متوسطة عاقل بن البكير</span></div></header>
 <div class="progress" aria-label="خطوات المشاركة"><div class="step active" id="step1"><b>١</b><span>بياناتك ومشاركتك</span></div><div class="track"></div><div class="step" id="step2"><b>٢</b><span>إرفاق الإبداع</span></div></div>
 <section class="panel">
@@ -168,8 +190,15 @@ body{padding:10px}
 </section></main>
 <script>
 const $=id=>document.getElementById(id);let selectedKind='';
+function showNotice(message,title='المسابقة مغلقة حاليًا'){
+  $('noticeTitle').textContent=title;
+  $('noticeMessage').textContent=message;
+  $('noticeOverlay').classList.add('show');
+}
+function hideNotice(){$('noticeOverlay').classList.remove('show')}
+$('noticeOk').addEventListener('click',hideNotice);
 function showPage(n){$('page1').classList.toggle('active',n===1);$('page2').classList.toggle('active',n===2);$('step1').classList.toggle('active',n===1);$('step1').classList.toggle('done',n===2);$('step2').classList.toggle('active',n===2);}
-document.querySelectorAll('input[name="kind"]').forEach(r=>r.addEventListener('change',()=>{if(!$('student').value.trim()){alert('فضلاً اكتب الاسم الثلاثي أولاً.');$('student').focus();r.checked=false;return}if(!$('class').value){alert('فضلاً اختر الصف والفصل أولاً.');$('class').focus();r.checked=false;return}selectedKind=r.value;document.querySelectorAll('.choice').forEach(c=>c.classList.toggle('selected',c.contains(r)));$('summary').textContent='الطالب: '+$('student').value.trim()+'  •  الصف: '+$('class').value+'  •  نوع المشاركة: '+selectedKind;showPage(2);}));
+document.querySelectorAll('input[name="kind"]').forEach(r=>r.addEventListener('change',()=>{if($('student').value.trim().split(/\s+/).filter(Boolean).length<3){showNotice('فضلاً اكتب الاسم الثلاثي المكوّن من ثلاثة أسماء.','الاسم الثلاثي مطلوب');$('student').focus();r.checked=false;return}if(!$('class').value){alert('فضلاً اختر الصف والفصل أولاً.');$('class').focus();r.checked=false;return}selectedKind=r.value;document.querySelectorAll('.choice').forEach(c=>c.classList.toggle('selected',c.contains(r)));$('summary').textContent='الطالب: '+$('student').value.trim()+'  •  الصف: '+$('class').value+'  •  نوع المشاركة: '+selectedKind;showPage(2);}));
 $('back').addEventListener('click',()=>showPage(1));
 const formatSize=bytes=>bytes>=1024*1024?(bytes/1024/1024).toFixed(1)+' ميجابايت':(bytes/1024).toFixed(0)+' كيلوبايت';
 function maxSize(file){const type=(file.type||'').toLowerCase();const name=file.name.toLowerCase();if(type.startsWith('image/')||/\\.(jpg|jpeg|png|gif|webp|heic|heif|bmp)$/.test(name))return 10*1024*1024;if(type.startsWith('video/')||/\\.(mp4|mov|m4v|avi|mkv|webm|3gp)$/.test(name))return 200*1024*1024;if(type.startsWith('audio/')||/\\.(mp3|wav|m4a|aac|ogg|opus|flac)$/.test(name))return 20*1024*1024;return 25*1024*1024;}
@@ -234,12 +263,12 @@ function uploadVideoToX02(file){
   });
 }
 
-async function checkOpenState(){try{const {data,error}=await window.ibdaaDb.from('ibdaa_settings').select('is_open').eq('id',1).single();if(error)throw error;if(!data.is_open){$('send').disabled=true;$('send').textContent='استقبال المشاركات مغلق حاليًا';$('note').textContent='نعتذر، صندوق الإبداع مغلق حاليًا عن استقبال المشاركات.';$('note').classList.add('show');}}catch(e){console.error(e);$('note').textContent='تعذر التحقق من حالة استقبال المشاركات. حاول لاحقًا.';$('note').classList.add('show');}}
+async function checkOpenState(){try{const {data,error}=await window.ibdaaDb.from('ibdaa_settings').select('is_open').eq('id',1).single();if(error)throw error;if(!data.is_open){$('send').disabled=true;$('send').textContent='استقبال المشاركات مغلق حاليًا';$('note').textContent='نعتذر، صندوق الإبداع مغلق حاليًا عن استقبال المشاركات.';$('note').classList.add('show');showNotice('نعتذر، لا نستقبل المشاركات في الوقت الحالي.','المسابقة مغلقة حاليًا',true);}}catch(e){console.error(e);$('note').textContent='تعذر التحقق من حالة استقبال المشاركات. حاول لاحقًا.';$('note').classList.add('show');}}
 $('send').addEventListener('click',async()=>{
- const state=await window.ibdaaDb.from('ibdaa_settings').select('is_open').eq('id',1).single();if(state.error||!state.data?.is_open){alert('صندوق الإبداع مغلق حاليًا عن استقبال المشاركات.');return;}
+ const state=await window.ibdaaDb.from('ibdaa_settings').select('is_open').eq('id',1).single();if(state.error||!state.data?.is_open){showNotice('نعتذر، لا نستقبل المشاركات في الوقت الحالي.','المسابقة مغلقة حاليًا',true);return;}
  const files=Array.from($('upload').files);
  if(!files.length){alert('فضلاً اختر ملف المشاركة أولاً.');return}
- if(!$('student').value.trim()||!$('class').value||!selectedKind){alert('تأكد من الاسم والصف ونوع المشاركة.');showPage(1);return}
+ if($('student').value.trim().split(/\s+/).filter(Boolean).length<3){showPage(1);showNotice('فضلاً اكتب الاسم الثلاثي المكوّن من ثلاثة أسماء.','الاسم الثلاثي مطلوب');$('student').focus();return}if(!$('class').value||!selectedKind){alert('تأكد من الصف ونوع المشاركة.');showPage(1);return}
  if(!window.ibdaaDb){alert('جارٍ تجهيز الاتصال، حاول بعد لحظات.');return}
  const btn=$('send');btn.disabled=true;resetSendButton();$('sendBtnLabel').textContent='جارٍ إرسال إبداعك...';
  try{
