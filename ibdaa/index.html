@@ -31,7 +31,7 @@ body{padding:10px}
 .progress{flex:0 0 auto;min-height:27px}.step{font-size:12px}.step b{width:24px;height:24px}.track{width:38px}
 .panel{flex:1 1 auto;min-height:0;overflow:hidden;padding:clamp(11px,2.1vh,17px);display:flex}
 .page{display:none;width:100%;min-height:0}.page.active{display:flex;flex-direction:column;animation:appear .18s ease}
-.heading{font-size:clamp(17px,2.5vh,20px);margin:0 0 3px}.subheading{font-size:clamp(11px,1.65vh,13px);line-height:1.45;margin:0 0 10px}
+.heading{font-size:clamp(17px,2.5vh,20px);margin:0 0 3px}#page1>h2.heading{text-align:center;width:100%}.subheading{font-size:clamp(11px,1.65vh,13px);line-height:1.45;margin:0 0 10px}
 .fields{grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px}.field label{font-size:13px;margin-bottom:5px}.field input,.field select{padding:10px 10px;font-size:14px;border-radius:11px;min-height:43px}
 #page1 h3.heading{font-size:16px!important;margin:0 0 3px!important}#page1 .subheading[style]{font-size:11px;margin:0 0 8px!important}
 .choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
@@ -193,7 +193,7 @@ $('send').addEventListener('click',async()=>{
    const safe=f.name.replace(/[^\\p{L}\\p{N}._-]/gu,'_');
     if((f.type||'').toLowerCase().startsWith('video/')||/\.(mp4|mov|m4v|avi|mkv|webm|3gp)$/i.test(f.name)){
       const hosted=await uploadVideoToX02(f);
-      rows.push({student_name:$('student').value.trim(),class_name:$('class').value,category:selectedKind,description:$('description').value.trim(),file_name:f.name,file_path:null,file_url:hosted.url,file_type:hosted.mimeType||f.type||'video/*',file_size:hosted.sizeBytes||f.size});
+      rows.push({student_name:$('student').value.trim(),class_name:$('class').value,category:selectedKind,description:$('description').value.trim(),file_name:f.name,file_path:'x02-upload/'+crypto.randomUUID(),file_url:hosted.url,file_type:hosted.mimeType||f.type||'video/*',file_size:hosted.sizeBytes||f.size});
     }else{
       const path=Date.now()+'_'+crypto.randomUUID()+'_'+safe;
       const up=await window.ibdaaDb.storage.from('ibdaa-files').upload(path,f,{upsert:false,contentType:f.type||'application/octet-stream'});
