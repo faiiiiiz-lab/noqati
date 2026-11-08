@@ -127,6 +127,39 @@ body{padding:10px}
 }
 </style>
 
+<style>
+/* مؤشر تقدم مدمج أسفل اختيار الملف داخل الإطار */
+.upload-progress{width:100%;margin:5px auto 0;padding:7px 9px;border:1px solid #dce9df;border-radius:11px;background:#edf6ef;text-align:right}
+.upload-progress[hidden]{display:none!important}
+.upload-progress-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#075b46;font-size:11px;line-height:1.35}
+.upload-progress-top b{font-size:12px;direction:ltr}
+.upload-progress-track{height:7px;background:#d8e7dc;border-radius:20px;overflow:hidden;margin-top:5px}
+.upload-progress-track>div{height:100%;width:0;background:linear-gradient(90deg,#0d7959,#20a477);border-radius:20px;transition:width .12s linear}
+.upload-progress-detail{font-size:10px;color:#60756c;margin-top:4px;line-height:1.3}
+@media(max-height:740px){.upload-progress{padding:5px 8px;margin-top:3px}.upload-progress-track{height:6px;margin-top:4px}.upload-progress-detail{font-size:9px;margin-top:3px}}
+</style>
+
+<style>
+/* تعديل موضع مؤشر الرفع فقط: يبقى داخل الإطار المنقّط */
+#page2 .uploadbox{position:relative !important;}
+#page2 .upload-progress{
+  position:absolute !important;
+  left:10px !important;
+  right:10px !important;
+  bottom:8px !important;
+  width:auto !important;
+  margin:0 !important;
+  padding:5px 8px !important;
+  z-index:2;
+}
+#page2 .upload-progress-top{font-size:11px !important;line-height:1.25 !important;}
+#page2 .upload-progress-top b{font-size:11px !important;}
+#page2 .upload-progress-track{height:6px !important;margin-top:4px !important;}
+#page2 .upload-progress-detail{font-size:9px !important;line-height:1.2 !important;margin-top:3px !important;}
+/* إفساح مكان ثابت أسفل اسم الملف عند ظهور المؤشر */
+#page2 .uploadbox:has(.upload-progress:not([hidden])) .filelist{margin-bottom:62px !important;}
+</style>
+
 </head>
 <body><main class="shell">
 <header class="header"><div class="kicker">فعالية الويكند</div><h1>صندوق الإبداع</h1><p>أبدع.. وشاركنا شيئاً تفخر به</p><div class="schools"><span>ابتدائية سهل بن عدي الأنصاري</span><i></i><span>متوسطة عاقل بن البكير</span></div></header>
@@ -146,7 +179,13 @@ body{padding:10px}
 <label class="choice"><input type="radio" name="kind" value="مشاركة أخرى"><span class="emoji">⭐</span><span class="words"><strong>مشاركة أخرى</strong><small>أي إبداع آخر تحب مشاركته</small></span></label>
 </div><p class="subheading" style="text-align:center;margin:16px 0 0;color:#0d7959;font-weight:700">اضغط على نوع مشاركتك للانتقال مباشرةً إلى إرفاق الملف.</p></div>
 <div class="page" id="page2"><h2 class="heading">أرفق إبداعك ✨</h2><p class="subheading">بقيت خطوة واحدة! اختر الملف الذي يحتوي على مشاركتك، ويمكنك إضافة وصف بسيط لها.</p>
-<div class="uploadbox"><div class="uploadicon">📎</div><strong>ملف المشاركة</strong><p>اضغط على الزر لاختيار ملف من جهازك. الحد الأقصى: الصور 10MB، الفيديو 200MB، الصوت 20MB، والملفات الأخرى 25MB. الحد الأعلى للفيديو 200MB.</p><label class="pick" for="upload">＋ اختيار ملف من الجهاز</label><input id="upload" type="file" multiple><div class="filelist" id="filelist">لم يتم اختيار أي ملف بعد</div></div>
+<div class="uploadbox"><div class="uploadicon">📎</div><strong>ملف المشاركة</strong><p>اضغط على الزر لاختيار ملف من جهازك. الحد الأقصى: الصور 10MB، الفيديو 200MB، الصوت 20MB، والملفات الأخرى 25MB. الحد الأعلى للفيديو 200MB.</p><label class="pick" for="upload">＋ اختيار ملف من الجهاز</label><input id="upload" type="file" multiple><div class="filelist" id="filelist">لم يتم اختيار أي ملف بعد</div>
+<div class="upload-progress" id="uploadProgress" aria-live="polite" hidden>
+  <div class="upload-progress-top"><strong id="uploadProgressLabel">جارٍ رفع الملف...</strong><b id="uploadProgressPercent">0%</b></div>
+  <div class="upload-progress-track"><div id="uploadProgressBar"></div></div>
+  <div class="upload-progress-detail" id="uploadProgressDetail">يرجى إبقاء الصفحة مفتوحة</div>
+</div>
+</div>
 <div class="field description"><label for="description">وصف المشاركة <span class="optional">(اختياري)</span></label><textarea id="description" placeholder="اكتب نبذة قصيرة عن إبداعك أو فكرتك..."></textarea></div>
 <div class="summary" id="summary"></div><div class="footer"><button class="btn secondary" id="back">رجوع</button><button class="btn primary" id="send">أرسل إبداعي ✨</button></div><div class="points">⭐ المشاركة المعتمدة = نقطتان في برنامج نقاطي</div><div class="note" id="note">هذه نسخة تجريبية للواجهة؛ لم يتم ربط الإرسال الفعلي بقاعدة البيانات أو مساحة حفظ الملفات بعد.</div></div>
 </section></main>
@@ -163,19 +202,47 @@ const SUPABASE_URL='https://apfyqlshgnocvbinosmb.supabase.co';
 const SUPABASE_KEY='sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38';
 const sbScript=document.createElement('script');sbScript.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';sbScript.onload=()=>{window.ibdaaDb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);checkOpenState()};document.head.appendChild(sbScript);
 
-async function uploadVideoToX02(file){
-  const form = new FormData();
-  form.append('file', file, file.name);
-  const response = await fetch(SUPABASE_URL + '/functions/v1/upload-video-x02', {
-    method: 'POST',
-    headers: { 'apikey': SUPABASE_KEY },
-    body: form
+function setUploadProgress(percent,label,detail){
+  const box=$('uploadProgress');
+  box.hidden=false;
+  const value=Math.max(0,Math.min(100,Math.round(percent)));
+  $('uploadProgressBar').style.width=value+'%';
+  $('uploadProgressPercent').textContent=value+'%';
+  $('uploadProgressLabel').textContent=label||'جارٍ رفع الملف...';
+  $('uploadProgressDetail').textContent=detail||'يرجى إبقاء الصفحة مفتوحة حتى يكتمل الإرسال';
+}
+function uploadVideoToX02(file){
+  return new Promise((resolve,reject)=>{
+    const form=new FormData();
+    form.append('file',file,file.name);
+    const xhr=new XMLHttpRequest();
+    xhr.open('POST',SUPABASE_URL+'/functions/v1/upload-video-x02',true);
+    xhr.setRequestHeader('apikey',SUPABASE_KEY);
+    xhr.upload.onprogress=(event)=>{
+      if(event.lengthComputable){
+        const pct=(event.loaded/event.total)*100;
+        setUploadProgress(pct,'جارٍ رفع الفيديو...',formatSize(event.loaded)+' من '+formatSize(event.total));
+        if(pct>=100){
+          setUploadProgress(100,'اكتمل نقل الملف، جارٍ تأكيد الحفظ...','لا تغلق الصفحة؛ ننتظر رد خدمة الاستضافة');
+        }
+      }
+    };
+    xhr.onload=()=>{
+      let result={};
+      try{result=JSON.parse(xhr.responseText||'{}')}catch(e){}
+      if(xhr.status>=200&&xhr.status<300&&result.success&&result.url){
+        setUploadProgress(100,'اكتمل رفع الفيديو بنجاح','جارٍ حفظ بيانات المشاركة...');
+        resolve(result);
+      }else{
+        reject(new Error(result.error||result.details||'تعذر إكمال رفع الفيديو إلى X02 (HTTP '+xhr.status+')'));
+      }
+    };
+    xhr.onerror=()=>reject(new Error('انقطع الاتصال أثناء رفع الفيديو. تحقق من الإنترنت ثم أعد المحاولة.'));
+    xhr.onabort=()=>reject(new Error('تم إيقاف رفع الفيديو قبل اكتماله.'));
+    xhr.ontimeout=()=>reject(new Error('انتهت مهلة الاتصال أثناء رفع الفيديو.'));
+    xhr.timeout=0;
+    xhr.send(form);
   });
-  const result = await response.json().catch(()=>({}));
-  if(!response.ok || !result.success || !result.url){
-    throw new Error(result.error || 'تعذر رفع الفيديو إلى X02');
-  }
-  return result;
 }
 
 async function checkOpenState(){try{const {data,error}=await window.ibdaaDb.from('ibdaa_settings').select('is_open').eq('id',1).single();if(error)throw error;if(!data.is_open){$('send').disabled=true;$('send').textContent='استقبال المشاركات مغلق حاليًا';$('note').textContent='نعتذر، صندوق الإبداع مغلق حاليًا عن استقبال المشاركات.';$('note').classList.add('show');}}catch(e){console.error(e);$('note').textContent='تعذر التحقق من حالة استقبال المشاركات. حاول لاحقًا.';$('note').classList.add('show');}}
@@ -186,12 +253,14 @@ $('send').addEventListener('click',async()=>{
  if(!$('student').value.trim()||!$('class').value||!selectedKind){alert('تأكد من الاسم والصف ونوع المشاركة.');showPage(1);return}
  if(!window.ibdaaDb){alert('جارٍ تجهيز الاتصال، حاول بعد لحظات.');return}
  const btn=$('send');btn.disabled=true;btn.textContent='جارٍ إرسال إبداعك...';
+ $('uploadProgress').hidden=true;
  try{
   const rows=[];
   for(const f of files){
    if(f.size>maxSize(f))throw new Error('الملف '+f.name+' تجاوز الحجم المسموح.');
    const safe=f.name.replace(/[^\\p{L}\\p{N}._-]/gu,'_');
     if((f.type||'').toLowerCase().startsWith('video/')||/\.(mp4|mov|m4v|avi|mkv|webm|3gp)$/i.test(f.name)){
+      setUploadProgress(0,'جارٍ تجهيز رفع الفيديو...', 'حجم الملف: '+formatSize(f.size)+' — يرجى إبقاء الصفحة مفتوحة');
       const hosted=await uploadVideoToX02(f);
       rows.push({student_name:$('student').value.trim(),class_name:$('class').value,category:selectedKind,description:$('description').value.trim(),file_name:f.name,file_path:'x02-upload/'+crypto.randomUUID(),file_url:hosted.url,file_type:hosted.mimeType||f.type||'video/*',file_size:hosted.sizeBytes||f.size});
     }else{
@@ -201,6 +270,9 @@ $('send').addEventListener('click',async()=>{
       const pub=window.ibdaaDb.storage.from('ibdaa-files').getPublicUrl(path).data.publicUrl;
       rows.push({student_name:$('student').value.trim(),class_name:$('class').value,category:selectedKind,description:$('description').value.trim(),file_name:f.name,file_path:path,file_url:pub,file_type:f.type||'',file_size:f.size});
     }
+  }
+  if(!$('uploadProgress').hidden){
+    setUploadProgress(100,'اكتمل رفع الملف، جارٍ حفظ المشاركة...','لا تغلق الصفحة حتى تظهر رسالة نجاح الإرسال');
   }
   const ins=await window.ibdaaDb.from('ibdaa_submissions').insert(rows);
   if(ins.error)throw ins.error;
@@ -216,7 +288,9 @@ $('send').addEventListener('click',async()=>{
       </section>
     </main>`;
 
- }catch(e){console.error(e);alert('لم يكتمل الإرسال: '+(e.message||'تحقق من الاتصال وإعدادات قاعدة البيانات.'));btn.disabled=false;btn.textContent='أرسل إبداعي ✨'}
+ }catch(e){console.error(e);
+ if(!$('uploadProgress').hidden){$('uploadProgressLabel').textContent='تعذر إكمال الإرسال';$('uploadProgressDetail').textContent=e.message||'تحقق من الاتصال وحاول مجددًا';}
+ alert('لم يكتمل الإرسال: '+(e.message||'تحقق من الاتصال وإعدادات قاعدة البيانات.'));btn.disabled=false;btn.textContent='أرسل إبداعي ✨'}
 });
 </script></body></html>
 <style>
