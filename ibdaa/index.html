@@ -128,36 +128,15 @@ body{padding:10px}
 </style>
 
 <style>
-/* مؤشر تقدم مدمج أسفل اختيار الملف داخل الإطار */
-.upload-progress{width:100%;margin:5px auto 0;padding:7px 9px;border:1px solid #dce9df;border-radius:11px;background:#edf6ef;text-align:right}
-.upload-progress[hidden]{display:none!important}
-.upload-progress-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#075b46;font-size:11px;line-height:1.35}
-.upload-progress-top b{font-size:12px;direction:ltr}
-.upload-progress-track{height:7px;background:#d8e7dc;border-radius:20px;overflow:hidden;margin-top:5px}
-.upload-progress-track>div{height:100%;width:0;background:linear-gradient(90deg,#0d7959,#20a477);border-radius:20px;transition:width .12s linear}
-.upload-progress-detail{font-size:10px;color:#60756c;margin-top:4px;line-height:1.3}
-@media(max-height:740px){.upload-progress{padding:5px 8px;margin-top:3px}.upload-progress-track{height:6px;margin-top:4px}.upload-progress-detail{font-size:9px;margin-top:3px}}
-</style>
-
-<style>
-/* تعديل موضع مؤشر الرفع فقط: يبقى داخل الإطار المنقّط */
-#page2 .uploadbox{position:relative !important;}
-#page2 .upload-progress{
-  position:absolute !important;
-  left:10px !important;
-  right:10px !important;
-  bottom:8px !important;
-  width:auto !important;
-  margin:0 !important;
-  padding:5px 8px !important;
-  z-index:2;
-}
-#page2 .upload-progress-top{font-size:11px !important;line-height:1.25 !important;}
-#page2 .upload-progress-top b{font-size:11px !important;}
-#page2 .upload-progress-track{height:6px !important;margin-top:4px !important;}
-#page2 .upload-progress-detail{font-size:9px !important;line-height:1.2 !important;margin-top:3px !important;}
-/* إفساح مكان ثابت أسفل اسم الملف عند ظهور المؤشر */
-#page2 .uploadbox:has(.upload-progress:not([hidden])) .filelist{margin-bottom:62px !important;}
+/* مؤشر الرفع مدمج داخل زر الإرسال نفسه دون إضافة مساحة أو تغيير أبعاد الصفحة */
+#send.primary{position:relative;overflow:hidden;isolation:isolate;}
+#send .send-progress-fill{position:absolute;inset:0 0 0 auto;width:0%;background:linear-gradient(90deg,#c9efd8,#a8dfbd);transition:width .18s linear;z-index:-1;}
+#send .send-btn-content{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:9px;width:100%;}
+#send #sendBtnPercent{font-size:.9em;direction:ltr;white-space:nowrap;}
+#send.is-uploading{background:#dcebe1;color:#075b46;box-shadow:0 7px 16px #075b4615;}
+#send.is-uploading .send-progress-fill{z-index:0;}
+#send.is-uploading .send-btn-content{z-index:1;color:#064333;text-shadow:none;}
+#send.is-saving .send-progress-fill{width:100%!important;background:linear-gradient(90deg,#c9efd8,#a8dfbd);}
 </style>
 
 </head>
@@ -180,14 +159,12 @@ body{padding:10px}
 </div><p class="subheading" style="text-align:center;margin:16px 0 0;color:#0d7959;font-weight:700">اضغط على نوع مشاركتك للانتقال مباشرةً إلى إرفاق الملف.</p></div>
 <div class="page" id="page2"><h2 class="heading">أرفق إبداعك ✨</h2><p class="subheading">بقيت خطوة واحدة! اختر الملف الذي يحتوي على مشاركتك، ويمكنك إضافة وصف بسيط لها.</p>
 <div class="uploadbox"><div class="uploadicon">📎</div><strong>ملف المشاركة</strong><p>اضغط على الزر لاختيار ملف من جهازك. الحد الأقصى: الصور 10MB، الفيديو 200MB، الصوت 20MB، والملفات الأخرى 25MB. الحد الأعلى للفيديو 200MB.</p><label class="pick" for="upload">＋ اختيار ملف من الجهاز</label><input id="upload" type="file" multiple><div class="filelist" id="filelist">لم يتم اختيار أي ملف بعد</div>
-<div class="upload-progress" id="uploadProgress" aria-live="polite" hidden>
-  <div class="upload-progress-top"><strong id="uploadProgressLabel">جارٍ رفع الملف...</strong><b id="uploadProgressPercent">0%</b></div>
-  <div class="upload-progress-track"><div id="uploadProgressBar"></div></div>
-  <div class="upload-progress-detail" id="uploadProgressDetail">يرجى إبقاء الصفحة مفتوحة</div>
-</div>
 </div>
 <div class="field description"><label for="description">وصف المشاركة <span class="optional">(اختياري)</span></label><textarea id="description" placeholder="اكتب نبذة قصيرة عن إبداعك أو فكرتك..."></textarea></div>
-<div class="summary" id="summary"></div><div class="footer"><button class="btn secondary" id="back">رجوع</button><button class="btn primary" id="send">أرسل إبداعي ✨</button></div><div class="points">⭐ المشاركة المعتمدة = نقطتان في برنامج نقاطي</div><div class="note" id="note">هذه نسخة تجريبية للواجهة؛ لم يتم ربط الإرسال الفعلي بقاعدة البيانات أو مساحة حفظ الملفات بعد.</div></div>
+<div class="summary" id="summary"></div><div class="footer"><button class="btn secondary" id="back">رجوع</button><button class="btn primary" id="send" aria-live="polite">
+  <span class="send-progress-fill" id="sendProgressFill"></span>
+  <span class="send-btn-content"><span id="sendBtnLabel">أرسل إبداعي ✨</span><b id="sendBtnPercent" hidden>0%</b></span>
+</button></div><div class="points">⭐ المشاركة المعتمدة = نقطتان في برنامج نقاطي</div><div class="note" id="note">هذه نسخة تجريبية للواجهة؛ لم يتم ربط الإرسال الفعلي بقاعدة البيانات أو مساحة حفظ الملفات بعد.</div></div>
 </section></main>
 <script>
 const $=id=>document.getElementById(id);let selectedKind='';
@@ -203,14 +180,26 @@ const SUPABASE_KEY='sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38';
 const sbScript=document.createElement('script');sbScript.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';sbScript.onload=()=>{window.ibdaaDb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);checkOpenState()};document.head.appendChild(sbScript);
 
 function setUploadProgress(percent,label,detail){
-  const box=$('uploadProgress');
-  box.hidden=false;
+  const btn=$('send');
   const value=Math.max(0,Math.min(100,Math.round(percent)));
-  $('uploadProgressBar').style.width=value+'%';
-  $('uploadProgressPercent').textContent=value+'%';
-  $('uploadProgressLabel').textContent=label||'جارٍ رفع الملف...';
-  $('uploadProgressDetail').textContent=detail||'يرجى إبقاء الصفحة مفتوحة حتى يكتمل الإرسال';
+  btn.classList.add('is-uploading');
+  btn.classList.toggle('is-saving',value>=100 && (label||'').includes('تأكيد'));
+  $('sendProgressFill').style.width=value+'%';
+  $('sendBtnPercent').hidden=false;
+  $('sendBtnPercent').textContent=value+'%';
+  $('sendBtnLabel').textContent=label||'جارٍ إرسال إبداعك...';
+  if(detail) btn.setAttribute('aria-label',(label||'جارٍ الإرسال')+'، '+value+'%، '+detail);
 }
+function resetSendButton(){
+  const btn=$('send');
+  btn.classList.remove('is-uploading','is-saving');
+  $('sendProgressFill').style.width='0%';
+  $('sendBtnPercent').hidden=true;
+  $('sendBtnPercent').textContent='0%';
+  $('sendBtnLabel').textContent='أرسل إبداعي ✨';
+  btn.removeAttribute('aria-label');
+}
+
 function uploadVideoToX02(file){
   return new Promise((resolve,reject)=>{
     const form=new FormData();
@@ -252,8 +241,7 @@ $('send').addEventListener('click',async()=>{
  if(!files.length){alert('فضلاً اختر ملف المشاركة أولاً.');return}
  if(!$('student').value.trim()||!$('class').value||!selectedKind){alert('تأكد من الاسم والصف ونوع المشاركة.');showPage(1);return}
  if(!window.ibdaaDb){alert('جارٍ تجهيز الاتصال، حاول بعد لحظات.');return}
- const btn=$('send');btn.disabled=true;btn.textContent='جارٍ إرسال إبداعك...';
- $('uploadProgress').hidden=true;
+ const btn=$('send');btn.disabled=true;resetSendButton();$('sendBtnLabel').textContent='جارٍ إرسال إبداعك...';
  try{
   const rows=[];
   for(const f of files){
@@ -271,9 +259,10 @@ $('send').addEventListener('click',async()=>{
       rows.push({student_name:$('student').value.trim(),class_name:$('class').value,category:selectedKind,description:$('description').value.trim(),file_name:f.name,file_path:path,file_url:pub,file_type:f.type||'',file_size:f.size});
     }
   }
-  if(!$('uploadProgress').hidden){
-    setUploadProgress(100,'اكتمل رفع الملف، جارٍ حفظ المشاركة...','لا تغلق الصفحة حتى تظهر رسالة نجاح الإرسال');
-  }
+  if(btn.classList.contains('is-uploading')){
+    setUploadProgress(100,'جارٍ تأكيد حفظ المشاركة...','لا تغلق الصفحة حتى تظهر رسالة النجاح');
+    btn.classList.add('is-saving');
+  } else { $('sendBtnLabel').textContent='جارٍ حفظ المشاركة...'; }
   const ins=await window.ibdaaDb.from('ibdaa_submissions').insert(rows);
   if(ins.error)throw ins.error;
   // استبدال نموذج المشاركة بالكامل برسالة ختامية بعد تأكيد حفظ المشاركة في قاعدة البيانات
@@ -289,8 +278,7 @@ $('send').addEventListener('click',async()=>{
     </main>`;
 
  }catch(e){console.error(e);
- if(!$('uploadProgress').hidden){$('uploadProgressLabel').textContent='تعذر إكمال الإرسال';$('uploadProgressDetail').textContent=e.message||'تحقق من الاتصال وحاول مجددًا';}
- alert('لم يكتمل الإرسال: '+(e.message||'تحقق من الاتصال وإعدادات قاعدة البيانات.'));btn.disabled=false;btn.textContent='أرسل إبداعي ✨'}
+ alert('لم يكتمل الإرسال: '+(e.message||'تحقق من الاتصال وإعدادات قاعدة البيانات.'));btn.disabled=false;resetSendButton();}
 });
 </script></body></html>
 <style>
