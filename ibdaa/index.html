@@ -1,1 +1,207 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#075b46">
+<title>صندوق الإبداع</title>
+<style>
+:root{--green:#075b46;--green2:#0d7959;--ink:#18352f;--muted:#60756c;--line:#dce9df;--pale:#f2f8f3;--gold:#f6d995}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Tahoma,Arial,sans-serif;color:var(--ink)}
+body{min-height:100dvh;background:radial-gradient(circle at 10% 5%,#e3f2e7 0,transparent 32%),linear-gradient(145deg,#eef5ef,#f9fbf9);padding:14px}
+.shell{width:min(100%,680px);margin:0 auto;min-height:calc(100dvh - 28px);display:flex;flex-direction:column;gap:14px}
+.header{background:linear-gradient(125deg,#064333,#0d7657);color:#fff;text-align:center;border-radius:23px;padding:17px 14px 15px;box-shadow:0 12px 28px #073e2d20}
+.kicker{font-size:13px;color:#d8eee2;font-weight:700}.header h1{margin:5px 0;color:#ffe5a6;font-size:clamp(27px,6vw,35px);line-height:1.25}.header p{margin:4px 0 0;font-size:14px;color:#f2f8f3}.schools{display:flex;justify-content:center;align-items:center;gap:9px;white-space:nowrap;margin-top:9px;font-size:10px;color:#e5f3e9;font-weight:700}.schools i{height:13px;width:1px;background:#d8eee1;opacity:.8}
+.progress{display:flex;align-items:center;gap:9px;justify-content:center;padding:0 8px}.step{display:flex;align-items:center;gap:7px;color:#7a8d83;font-size:13px;font-weight:700}.step b{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:#e1eae3;color:#60756c}.step.active{color:var(--green)}.step.active b,.step.done b{background:var(--green);color:white}.step.done{color:var(--green)}.track{height:2px;background:#d5e2d8;width:44px;border-radius:5px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:clamp(17px,4vw,25px);box-shadow:0 10px 28px #143c270d;flex:1}
+.page{display:none}.page.active{display:block;animation:appear .22s ease}@keyframes appear{from{opacity:.45;transform:translateY(5px)}to{opacity:1;transform:none}}
+.heading{font-size:20px;color:var(--green);margin:0 0 6px;font-weight:800}.subheading{font-size:13px;color:var(--muted);margin:0 0 19px;line-height:1.7}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:22px}.field label{display:block;font-size:15px;font-weight:800;margin-bottom:8px}.field input,.field select,.field textarea{width:100%;border:1.5px solid #d3e1d7;border-radius:13px;background:#fbfdfb;padding:14px 12px;font:inherit;font-size:16px;color:var(--ink);outline:none;min-width:0}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green2);box-shadow:0 0 0 3px #0d79591a}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.choice{position:relative;display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);border-radius:15px;padding:12px 13px;min-height:78px;background:#fcfefc;cursor:pointer;transition:.15s}.choice input{position:absolute;opacity:0;pointer-events:none}.choice .emoji{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#edf6ef;font-size:24px;flex:0 0 42px}.choice .words{min-width:0}.choice strong{display:block;font-size:14px;color:#23483c;margin-bottom:4px}.choice small{display:block;font-size:11px;line-height:1.5;color:var(--muted)}.choice.selected{border:2px solid var(--green2);background:#eff8f1;box-shadow:0 4px 12px #0d795915}.choice.selected .emoji{background:#dcefe1}
+.footer{display:flex;gap:10px;margin-top:22px}.btn{border:0;border-radius:14px;padding:14px 18px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;min-height:52px}.primary{background:linear-gradient(110deg,#0a7655,#07503e);color:#fff;box-shadow:0 7px 16px #075b4625;flex:1}.secondary{background:#edf4ef;color:var(--green);border:1px solid #d6e5da;min-width:105px}.btn:disabled{opacity:.45;cursor:not-allowed}
+.uploadbox{border:2px dashed #a8cbb4;background:#f6fbf7;border-radius:18px;padding:24px 16px;text-align:center;margin:18px 0 20px}.uploadicon{width:62px;height:62px;border-radius:18px;background:#e4f2e7;color:var(--green);display:grid;place-items:center;font-size:30px;margin:0 auto 11px}.uploadbox strong{display:block;color:var(--green);font-size:17px;margin-bottom:6px}.uploadbox p{font-size:12px;color:var(--muted);line-height:1.7;margin:0 auto 15px;max-width:330px}.pick{display:inline-flex;align-items:center;justify-content:center;background:var(--green);color:#fff;border-radius:12px;padding:12px 22px;font-size:14px;font-weight:800;cursor:pointer}#upload{display:none}.filelist{margin-top:13px;color:var(--green);font-size:13px;line-height:1.7;overflow-wrap:anywhere}.description{margin-top:4px}.description textarea{height:105px;resize:vertical;line-height:1.7}.optional{font-size:11px;color:#829188;font-weight:400;margin-right:4px}.summary{background:#f4f8f4;border:1px solid #e1ece3;border-radius:13px;padding:11px 13px;font-size:13px;color:#476257;line-height:1.8;margin-top:16px}.points{text-align:center;color:#80601d;font-size:13px;font-weight:800;margin-top:14px}.note{display:none;margin-top:12px;padding:12px;border-radius:12px;background:#fff5df;color:#785b1b;font-size:13px;line-height:1.7}.note.show{display:block}
+@media(max-width:430px){body{padding:9px}.shell{min-height:calc(100dvh - 18px);gap:10px}.header{padding:14px 10px;border-radius:19px}.schools{font-size:9px;gap:7px}.fields{grid-template-columns:1fr;gap:12px;margin-bottom:19px}.field label{font-size:14px}.choice{padding:10px;gap:9px;min-height:74px}.choice .emoji{width:36px;height:36px;flex-basis:36px;font-size:21px}.choice strong{font-size:13px}.choice small{font-size:10px}.panel{padding:16px}.heading{font-size:19px}.subheading{margin-bottom:15px}.footer{margin-top:18px}.btn{font-size:15px;padding:13px 14px}}
+@media(max-width:350px){.choices{grid-template-columns:1fr}.schools{font-size:8px}.step{font-size:11px}}
 
+/* Center the welcome heading on the student details page */
+#page1 > h2.heading{text-align:center;width:100%;}
+</style>
+<style>
+/* إعادة توزيع العناصر لتناسب شاشة واحدة في كل خطوة */
+html,body{width:100%;height:100%;min-height:0;overflow:hidden}
+body{padding:10px}
+.shell{height:calc(100dvh - 20px);min-height:0;gap:9px;width:min(100%,680px)}
+.header{flex:0 0 auto;padding:11px 12px 10px;border-radius:18px}
+.kicker{font-size:11px}.header h1{font-size:clamp(24px,4.2vh,31px);margin:2px 0;line-height:1.15}.header p{font-size:12px;margin:3px 0 0}.schools{font-size:9px;margin-top:6px;gap:8px}
+.progress{flex:0 0 auto;min-height:27px}.step{font-size:12px}.step b{width:24px;height:24px}.track{width:38px}
+.panel{flex:1 1 auto;min-height:0;overflow:hidden;padding:clamp(11px,2.1vh,17px);display:flex}
+.page{display:none;width:100%;min-height:0}.page.active{display:flex;flex-direction:column;animation:appear .18s ease}
+.heading{font-size:clamp(17px,2.5vh,20px);margin:0 0 3px}.subheading{font-size:clamp(11px,1.65vh,13px);line-height:1.45;margin:0 0 10px}
+.fields{grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px}.field label{font-size:13px;margin-bottom:5px}.field input,.field select{padding:10px 10px;font-size:14px;border-radius:11px;min-height:43px}
+#page1 h3.heading{font-size:16px!important;margin:0 0 3px!important}#page1 .subheading[style]{font-size:11px;margin:0 0 8px!important}
+.choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.choice{min-height:0;height:clamp(54px,8.3vh,66px);padding:6px 9px;gap:9px;border-radius:12px}
+.choice .emoji{width:40px;height:40px;flex:0 0 40px;border-radius:11px;font-size:25px}
+.choice strong{font-size:13px;margin-bottom:2px}.choice small{font-size:10px;line-height:1.25}
+#page1>p:last-child{font-size:11px!important;margin:9px 0 0!important;line-height:1.35}
+#page2 .uploadbox{margin:7px 0 10px;padding:13px 12px;border-radius:15px;flex:0 0 auto}
+.uploadicon{width:50px;height:50px;border-radius:14px;font-size:27px;margin:0 auto 7px}
+.uploadbox strong{font-size:15px;margin-bottom:3px}.uploadbox p{font-size:11px;line-height:1.45;margin:0 auto 9px}
+.pick{padding:10px 18px;font-size:13px;border-radius:10px}.filelist{font-size:11px;margin-top:7px;max-height:35px;overflow:auto}
+.description{margin-top:0;flex:0 0 auto}.description label{font-size:13px}.description textarea{height:clamp(58px,9vh,75px);min-height:0;padding:9px 10px;font-size:13px;resize:none}
+.summary{font-size:11px;line-height:1.5;padding:8px 10px;margin-top:9px;flex:0 0 auto}
+.footer{margin-top:9px;gap:8px;flex:0 0 auto}.btn{min-height:44px;padding:10px 15px;font-size:14px;border-radius:11px}
+.points{font-size:11px;margin-top:8px;flex:0 0 auto}.note{font-size:11px;padding:8px;margin-top:7px}
+@media(max-width:430px){body{padding:8px}.shell{height:calc(100dvh - 16px);min-height:0;gap:7px}.header{padding:10px 8px 9px}.schools{font-size:8px;gap:6px}.panel{padding:11px}.fields{grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}.field label{font-size:12px}.field input,.field select{font-size:13px;padding:9px 7px;min-height:41px}.choice{height:clamp(52px,8vh,62px);padding:5px 7px;gap:7px}.choice .emoji{width:36px;height:36px;flex-basis:36px;font-size:23px}.choice strong{font-size:12px}.choice small{font-size:9px}.step{font-size:11px}.track{width:30px}}
+@media(max-height:700px){.header{padding:8px 10px}.header h1{font-size:24px}.header p{font-size:11px}.schools{margin-top:4px}.panel{padding:9px}.fields{margin-bottom:8px}.choice{height:50px}.choice .emoji{width:34px;height:34px;flex-basis:34px;font-size:21px}.choice small{font-size:9px}.uploadbox{padding:9px!important;margin:5px 0 7px!important}.uploadicon{width:42px;height:42px;font-size:23px}.description textarea{height:54px}.summary{margin-top:6px}.footer{margin-top:6px}.points{margin-top:5px}}
+@media(max-width:350px){.schools{font-size:7px}.choice{gap:5px;padding:4px}.choice .emoji{width:30px;height:30px;flex-basis:30px;font-size:19px}.choice strong{font-size:11px}.choice small{font-size:8px}}
+</style>
+
+
+<style>
+/* ضبط نهائي للصفحة الثانية على الجوال: جميع العناصر ضمن ارتفاع الشاشة */
+#page2{gap:0;min-height:0;overflow:hidden}
+#page2 .heading{font-size:clamp(18px,2.4vh,21px);line-height:1.2;margin:0 0 3px;flex:0 0 auto}
+#page2>.subheading{font-size:clamp(11px,1.45vh,13px);line-height:1.35;margin:0 0 7px;flex:0 0 auto}
+#page2 .uploadbox{flex:1 1 0;min-height:0;margin:4px 0 7px!important;padding:clamp(8px,1.2vh,13px) 12px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+#page2 .uploadicon{width:clamp(38px,5.2vh,50px);height:clamp(38px,5.2vh,50px);font-size:clamp(21px,3vh,27px);margin:0 auto 3px}
+#page2 .uploadbox strong{font-size:clamp(14px,1.8vh,16px);margin:0}
+#page2 .uploadbox p{font-size:clamp(10px,1.35vh,12px);line-height:1.35;margin:0 auto 4px}
+#page2 .pick{padding:9px 17px;font-size:clamp(12px,1.6vh,14px);min-height:40px}
+#page2 .filelist{font-size:11px;line-height:1.35;margin-top:3px;max-height:30px;overflow:auto}
+#page2 .description{flex:0 0 auto;margin:0}
+#page2 .description label{display:block;font-size:13px;margin-bottom:4px}
+#page2 .description textarea{height:clamp(55px,7.5vh,72px);min-height:0;padding:8px 10px;font-size:13px;line-height:1.4;resize:none}
+#page2 .summary{flex:0 0 auto;margin-top:6px;padding:6px 9px;font-size:11px;line-height:1.4}
+#page2 .footer{flex:0 0 auto;margin-top:6px;gap:7px}
+#page2 .btn{min-height:40px;padding:8px 13px;font-size:14px}
+#page2 .points{flex:0 0 auto;font-size:11px;margin-top:5px;line-height:1.3}
+#page2 .note{flex:0 0 auto;font-size:10px;padding:6px;margin-top:5px;line-height:1.35}
+@media(max-height:740px){
+ #page2 .heading{font-size:17px}
+ #page2>.subheading{font-size:10px;margin-bottom:4px}
+ #page2 .uploadbox{padding:6px 9px!important;margin:3px 0 5px!important}
+ #page2 .uploadicon{width:34px;height:34px;font-size:20px}
+ #page2 .uploadbox p{font-size:10px}
+ #page2 .description textarea{height:48px}
+ #page2 .summary{font-size:10px;padding:5px 7px}
+ #page2 .btn{min-height:36px;padding:6px 10px;font-size:13px}
+ #page2 .points{font-size:10px;margin-top:3px}
+}
+@media(max-width:430px){
+ #page2 .uploadbox{border-radius:14px}
+ #page2 .description textarea{width:100%}
+}
+</style>
+
+
+<style>
+/* اجعل مساحة إرفاق الملف بحجم عملي بدلاً من تمددها لملء الفراغ */
+#page2 .uploadbox{
+  flex:0 0 auto !important;
+  height:clamp(165px,22vh,205px) !important;
+  min-height:0 !important;
+  box-sizing:border-box;
+  margin:5px 0 9px !important;
+  padding:12px 14px !important;
+  gap:5px !important;
+}
+#page2 .uploadicon{width:42px !important;height:42px !important;font-size:23px !important;margin:0 auto 2px !important}
+#page2 .uploadbox strong{font-size:16px !important}
+#page2 .uploadbox p{font-size:12px !important;line-height:1.4 !important;margin:0 auto 5px !important}
+#page2 .pick{min-height:40px !important;padding:9px 18px !important;font-size:14px !important}
+#page2 .filelist{margin-top:3px !important;max-height:26px !important}
+@media(max-height:740px){#page2 .uploadbox{height:clamp(145px,21vh,175px) !important;padding:8px 10px !important}}
+</style>
+
+
+<style>
+/* تكبير مساحة الوصف وزر الإرسال مع استثمار الفراغ أسفل الصفحة */
+#page2 .description{margin-top:5px !important;flex:0 0 auto !important}
+#page2 .description label{font-size:15px !important;margin-bottom:6px !important}
+#page2 .description textarea{height:clamp(105px,15vh,135px) !important;min-height:105px !important;padding:12px 13px !important;font-size:15px !important;line-height:1.6 !important}
+#page2 .summary{margin-top:10px !important;padding:9px 12px !important;font-size:12px !important;line-height:1.55 !important}
+#page2 .footer{margin-top:10px !important;gap:9px !important}
+#page2 .btn{min-height:56px !important;padding:12px 16px !important;font-size:17px !important;border-radius:14px !important}
+#page2 .points{font-size:13px !important;margin-top:9px !important;line-height:1.5 !important}
+@media(max-height:740px){
+ #page2 .description textarea{height:clamp(88px,13vh,112px) !important;min-height:88px !important}
+ #page2 .btn{min-height:50px !important;font-size:16px !important}
+ #page2 .summary{margin-top:7px !important}
+ #page2 .points{font-size:11px !important;margin-top:6px !important}
+}
+</style>
+
+</head>
+<body><main class="shell">
+<header class="header"><div class="kicker">فعالية الويكند</div><h1>صندوق الإبداع</h1><p>أبدع.. وشاركنا شيئاً تفخر به</p><div class="schools"><span>ابتدائية سهل بن عدي الأنصاري</span><i></i><span>متوسطة عاقل بن البكير</span></div></header>
+<div class="progress" aria-label="خطوات المشاركة"><div class="step active" id="step1"><b>١</b><span>بياناتك ومشاركتك</span></div><div class="track"></div><div class="step" id="step2"><b>٢</b><span>إرفاق الإبداع</span></div></div>
+<section class="panel">
+<div class="page active" id="page1"><h2 class="heading">أهلاً بك أيها المبدع! 🌟</h2><p class="subheading">ابدأ بكتابة بياناتك، ثم اختر نوع الإبداع الذي ترغب في مشاركته معنا.</p>
+<div class="fields"><div class="field"><label for="student">الاسم الثلاثي</label><input id="student" type="text" placeholder="اكتب اسمك الثلاثي" autocomplete="name"></div><div class="field"><label for="class">الصف والفصل</label><select id="class"><option value="">اختر الصف والفصل</option><option>الصف الرابع</option><option>الصف الخامس أ</option><option>الصف الخامس ب</option><option>الصف السادس</option><option>الأول متوسط أ</option><option>الأول متوسط ب</option><option>الثاني متوسط أ</option><option>الثاني متوسط ب</option><option>الثالث متوسط أ</option><option>الثالث متوسط ب</option></select></div></div>
+<h3 class="heading" style="font-size:18px;margin-bottom:5px">ماذا تود أن تشارك؟</h3><p class="subheading" style="margin-bottom:13px">اضغط على البطاقة المناسبة لمشاركتك.</p>
+<div class="choices">
+<label class="choice"><input type="radio" name="kind" value="صورة"><span class="emoji">📸</span><span class="words"><strong>صورة</strong><small>لقطة جميلة أو تصوير</small></span></label>
+<label class="choice"><input type="radio" name="kind" value="رسم وتصميم"><span class="emoji">🎨</span><span class="words"><strong>رسم وتصميم</strong><small>لوحة أو تصميم من إنجازك</small></span></label>
+<label class="choice"><input type="radio" name="kind" value="فيديو"><span class="emoji">🎬</span><span class="words"><strong>فيديو</strong><small>موهبة أو تجربة أو إنجاز</small></span></label>
+<label class="choice"><input type="radio" name="kind" value="تسجيل صوتي"><span class="emoji">🎙️</span><span class="words"><strong>تسجيل صوتي</strong><small>تلاوة أو إلقاء أو قراءة</small></span></label>
+<label class="choice"><input type="radio" name="kind" value="عمل يدوي"><span class="emoji">🛠️</span><span class="words"><strong>عمل يدوي</strong><small>مجسم أو صناعة يدوية</small></span></label>
+<label class="choice"><input type="radio" name="kind" value="فكرة مبتكرة"><span class="emoji">💡</span><span class="words"><strong>فكرة مبتكرة</strong><small>اختراع أو تجربة جديدة</small></span></label>
+<label class="choice"><input type="radio" name="kind" value="كتابة"><span class="emoji">✍️</span><span class="words"><strong>كتابة</strong><small>قصة أو خاطرة أو نص</small></span></label>
+<label class="choice"><input type="radio" name="kind" value="مشاركة أخرى"><span class="emoji">⭐</span><span class="words"><strong>مشاركة أخرى</strong><small>أي إبداع آخر تحب مشاركته</small></span></label>
+</div><p class="subheading" style="text-align:center;margin:16px 0 0;color:#0d7959;font-weight:700">اضغط على نوع مشاركتك للانتقال مباشرةً إلى إرفاق الملف.</p></div>
+<div class="page" id="page2"><h2 class="heading">أرفق إبداعك ✨</h2><p class="subheading">بقيت خطوة واحدة! اختر الملف الذي يحتوي على مشاركتك، ويمكنك إضافة وصف بسيط لها.</p>
+<div class="uploadbox"><div class="uploadicon">📎</div><strong>ملف المشاركة</strong><p>اضغط على الزر لاختيار ملف من جهازك. الحد الأقصى: الصور 10MB، الفيديو 50MB، الصوت 20MB، والملفات الأخرى 25MB. الحد الأعلى لأي ملف 50MB.</p><label class="pick" for="upload">＋ اختيار ملف من الجهاز</label><input id="upload" type="file" multiple><div class="filelist" id="filelist">لم يتم اختيار أي ملف بعد</div></div>
+<div class="field description"><label for="description">وصف المشاركة <span class="optional">(اختياري)</span></label><textarea id="description" placeholder="اكتب نبذة قصيرة عن إبداعك أو فكرتك..."></textarea></div>
+<div class="summary" id="summary"></div><div class="footer"><button class="btn secondary" id="back">رجوع</button><button class="btn primary" id="send">أرسل إبداعي ✨</button></div><div class="points">⭐ المشاركة المعتمدة = نقطتان في برنامج نقاطي</div><div class="note" id="note">هذه نسخة تجريبية للواجهة؛ لم يتم ربط الإرسال الفعلي بقاعدة البيانات أو مساحة حفظ الملفات بعد.</div></div>
+</section></main>
+<script>
+const $=id=>document.getElementById(id);let selectedKind='';
+function showPage(n){$('page1').classList.toggle('active',n===1);$('page2').classList.toggle('active',n===2);$('step1').classList.toggle('active',n===1);$('step1').classList.toggle('done',n===2);$('step2').classList.toggle('active',n===2);}
+document.querySelectorAll('input[name="kind"]').forEach(r=>r.addEventListener('change',()=>{if(!$('student').value.trim()){alert('فضلاً اكتب الاسم الثلاثي أولاً.');$('student').focus();r.checked=false;return}if(!$('class').value){alert('فضلاً اختر الصف والفصل أولاً.');$('class').focus();r.checked=false;return}selectedKind=r.value;document.querySelectorAll('.choice').forEach(c=>c.classList.toggle('selected',c.contains(r)));$('summary').textContent='الطالب: '+$('student').value.trim()+'  •  الصف: '+$('class').value+'  •  نوع المشاركة: '+selectedKind;showPage(2);}));
+$('back').addEventListener('click',()=>showPage(1));
+const formatSize=bytes=>bytes>=1024*1024?(bytes/1024/1024).toFixed(1)+' ميجابايت':(bytes/1024).toFixed(0)+' كيلوبايت';
+function maxSize(file){const type=(file.type||'').toLowerCase();const name=file.name.toLowerCase();if(type.startsWith('image/')||/\\.(jpg|jpeg|png|gif|webp|heic|heif|bmp)$/.test(name))return 10*1024*1024;if(type.startsWith('video/')||/\\.(mp4|mov|m4v|avi|mkv|webm|3gp)$/.test(name))return 50*1024*1024;if(type.startsWith('audio/')||/\\.(mp3|wav|m4a|aac|ogg|opus|flac)$/.test(name))return 20*1024*1024;return 25*1024*1024;}
+$('upload').addEventListener('change',()=>{const chosen=Array.from($('upload').files);const valid=chosen.filter(f=>f.size<=maxSize(f));const rejected=chosen.filter(f=>f.size>maxSize(f));if(rejected.length){const details=rejected.map(f=>f.name+' ('+formatSize(f.size)+') — الحد '+formatSize(maxSize(f))).join('، ');alert('تم استبعاد الملف أو الملفات التي تجاوزت الحجم المسموح:\n'+details);try{const dt=new DataTransfer();valid.forEach(f=>dt.items.add(f));$('upload').files=dt.files;}catch(e){$('upload').value='';$('filelist').textContent='أعد اختيار ملفات ضمن الأحجام المسموحة';return;}}const accepted=Array.from($('upload').files);$('filelist').textContent=accepted.length?accepted.map(f=>f.name+' ('+formatSize(f.size)+')').join('، '):'لم يتم اختيار أي ملف بعد';});
+// Supabase connection: public publishable key only; database policies are defined in setup.sql
+const SUPABASE_URL='https://apfyqlshgnocvbinosmb.supabase.co';
+const SUPABASE_KEY='sb_publishable_Hj9e3pyLlnLIj49naDxHjg_S-cTFE38';
+const sbScript=document.createElement('script');sbScript.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';sbScript.onload=()=>{window.ibdaaDb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);checkOpenState()};document.head.appendChild(sbScript);
+async function checkOpenState(){try{const {data,error}=await window.ibdaaDb.from('ibdaa_settings').select('is_open').eq('id',1).single();if(error)throw error;if(!data.is_open){$('send').disabled=true;$('send').textContent='استقبال المشاركات مغلق حاليًا';$('note').textContent='نعتذر، صندوق الإبداع مغلق حاليًا عن استقبال المشاركات.';$('note').classList.add('show');}}catch(e){console.error(e);$('note').textContent='تعذر التحقق من حالة استقبال المشاركات. حاول لاحقًا.';$('note').classList.add('show');}}
+$('send').addEventListener('click',async()=>{
+ const state=await window.ibdaaDb.from('ibdaa_settings').select('is_open').eq('id',1).single();if(state.error||!state.data?.is_open){alert('صندوق الإبداع مغلق حاليًا عن استقبال المشاركات.');return;}
+ const files=Array.from($('upload').files);
+ if(!files.length){alert('فضلاً اختر ملف المشاركة أولاً.');return}
+ if(!$('student').value.trim()||!$('class').value||!selectedKind){alert('تأكد من الاسم والصف ونوع المشاركة.');showPage(1);return}
+ if(!window.ibdaaDb){alert('جارٍ تجهيز الاتصال، حاول بعد لحظات.');return}
+ const btn=$('send');btn.disabled=true;btn.textContent='جارٍ إرسال إبداعك...';
+ try{
+  const rows=[];
+  for(const f of files){
+   if(f.size>maxSize(f))throw new Error('الملف '+f.name+' تجاوز الحجم المسموح.');
+   const safe=f.name.replace(/[^\\p{L}\\p{N}._-]/gu,'_');
+   const path=Date.now()+'_'+crypto.randomUUID()+'_'+safe;
+   const up=await window.ibdaaDb.storage.from('ibdaa-files').upload(path,f,{upsert:false,contentType:f.type||'application/octet-stream'});
+   if(up.error)throw up.error;
+   const pub=window.ibdaaDb.storage.from('ibdaa-files').getPublicUrl(path).data.publicUrl;
+   rows.push({student_name:$('student').value.trim(),class_name:$('class').value,category:selectedKind,description:$('description').value.trim(),file_name:f.name,file_path:path,file_url:pub,file_type:f.type||'',file_size:f.size});
+  }
+  const ins=await window.ibdaaDb.from('ibdaa_submissions').insert(rows);
+  if(ins.error)throw ins.error;
+  $('note').textContent='وصل إبداعك بنجاح! شكرًا لمشاركتك 🌟';$('note').classList.add('show');btn.textContent='تم إرسال المشاركة ✓';
+ }catch(e){console.error(e);alert('لم يكتمل الإرسال: '+(e.message||'تحقق من الاتصال وإعدادات قاعدة البيانات.'));btn.disabled=false;btn.textContent='أرسل إبداعي ✨'}
+});
+</script></body></html>
+<style>
+/* إبراز كلمة (اختياري) بجانب عنوان وصف المشاركة */
+#page2 .description label .optional{
+  display:inline-block !important;
+  margin-right:8px !important;
+  padding:3px 9px !important;
+  border-radius:999px !important;
+  background:#fff3cf !important;
+  color:#765817 !important;
+  font-size:13px !important;
+  font-weight:800 !important;
+  line-height:1.5 !important;
+  vertical-align:middle !important;
+}
+</style>
