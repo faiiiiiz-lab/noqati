@@ -20,9 +20,6 @@ body{min-height:100dvh;background:radial-gradient(circle at 10% 5%,#e3f2e7 0,tra
 .uploadbox{border:2px dashed #a8cbb4;background:#f6fbf7;border-radius:18px;padding:24px 16px;text-align:center;margin:18px 0 20px}.uploadicon{width:62px;height:62px;border-radius:18px;background:#e4f2e7;color:var(--green);display:grid;place-items:center;font-size:30px;margin:0 auto 11px}.uploadbox strong{display:block;color:var(--green);font-size:17px;margin-bottom:6px}.uploadbox p{font-size:12px;color:var(--muted);line-height:1.7;margin:0 auto 15px;max-width:330px}.pick{display:inline-flex;align-items:center;justify-content:center;background:var(--green);color:#fff;border-radius:12px;padding:12px 22px;font-size:14px;font-weight:800;cursor:pointer}#upload{display:none}.filelist{margin-top:13px;color:var(--green);font-size:13px;line-height:1.7;overflow-wrap:anywhere}.description{margin-top:4px}.description textarea{height:105px;resize:vertical;line-height:1.7}.optional{font-size:11px;color:#829188;font-weight:400;margin-right:4px}.summary{background:#f4f8f4;border:1px solid #e1ece3;border-radius:13px;padding:11px 13px;font-size:13px;color:#476257;line-height:1.8;margin-top:16px}.points{text-align:center;color:#80601d;font-size:13px;font-weight:800;margin-top:14px}.note{display:none;margin-top:12px;padding:12px;border-radius:12px;background:#fff5df;color:#785b1b;font-size:13px;line-height:1.7}.note.show{display:block}
 @media(max-width:430px){body{padding:9px}.shell{min-height:calc(100dvh - 18px);gap:10px}.header{padding:14px 10px;border-radius:19px}.schools{font-size:9px;gap:7px}.fields{grid-template-columns:1fr;gap:12px;margin-bottom:19px}.field label{font-size:14px}.choice{padding:10px;gap:9px;min-height:74px}.choice .emoji{width:36px;height:36px;flex-basis:36px;font-size:21px}.choice strong{font-size:13px}.choice small{font-size:10px}.panel{padding:16px}.heading{font-size:19px}.subheading{margin-bottom:15px}.footer{margin-top:18px}.btn{font-size:15px;padding:13px 14px}}
 @media(max-width:350px){.choices{grid-template-columns:1fr}.schools{font-size:8px}.step{font-size:11px}}
-
-/* Center the welcome heading on the student details page */
-#page1 > h2.heading{text-align:center;width:100%;}
 </style>
 <style>
 /* إعادة توزيع العناصر لتناسب شاشة واحدة في كل خطوة */
@@ -186,7 +183,18 @@ $('send').addEventListener('click',async()=>{
   }
   const ins=await window.ibdaaDb.from('ibdaa_submissions').insert(rows);
   if(ins.error)throw ins.error;
-  $('note').textContent='وصل إبداعك بنجاح! شكرًا لمشاركتك 🌟';$('note').classList.add('show');btn.textContent='تم إرسال المشاركة ✓';
+  // استبدال نموذج المشاركة بالكامل برسالة ختامية بعد تأكيد حفظ المشاركة في قاعدة البيانات
+  document.body.innerHTML = `
+    <main style="min-height:100dvh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 10% 5%,#e3f2e7 0,transparent 32%),linear-gradient(145deg,#eef5ef,#f9fbf9);font-family:Tahoma,Arial,sans-serif;color:#18352f;text-align:center">
+      <section style="width:min(100%,560px);background:#fff;border:1px solid #dce9df;border-radius:26px;padding:clamp(28px,7vw,48px) 22px;box-shadow:0 14px 36px #143c2715">
+        <div style="font-size:clamp(58px,15vw,78px);line-height:1.2;margin-bottom:15px">🎉</div>
+        <h1 style="font-size:clamp(27px,7vw,38px);line-height:1.5;color:#08734e;margin:0 0 12px">تم الإرسال بنجاح!</h1>
+        <h2 style="font-size:clamp(20px,5.4vw,27px);line-height:1.6;color:#244b3c;margin:0 0 12px">شكرًا لك على مشاركتك</h2>
+        <p style="font-size:clamp(16px,4vw,19px);line-height:1.9;color:#526b5d;margin:0">وصلنا إبداعك، وسيتم تقييم المشاركة. نتمنى لك التوفيق والتميز 🌟</p>
+        <div style="display:inline-block;margin-top:22px;padding:9px 18px;border-radius:999px;background:#e5f5e9;color:#08734e;font-size:14px;font-weight:bold">✓ تم استلام مشاركتك</div>
+      </section>
+    </main>`;
+
  }catch(e){console.error(e);alert('لم يكتمل الإرسال: '+(e.message||'تحقق من الاتصال وإعدادات قاعدة البيانات.'));btn.disabled=false;btn.textContent='أرسل إبداعي ✨'}
 });
 </script></body></html>
